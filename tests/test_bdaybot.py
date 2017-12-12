@@ -1,0 +1,1 @@
+from bdaybot import bot
