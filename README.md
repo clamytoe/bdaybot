@@ -9,9 +9,29 @@ The concept is simple. Tell the bot your birthday and when it comes around, get 
 [![GitHub Stars][stars-image]][stars-url]
 [![License][license-image]][license-url]
 
-## Initial Design Concept
+## Design Concept
 ![flowchart](img/flowchart.png)
 
+## Intial Setup
+```bash
+git clone https://github.com/clamytoe/bdaybot.git
+cd bdaybot
+```
+
+### Python VENV Environment
+
+```bash
+python3 -m venv venv
+source ./venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Anaconda Development Environment
+
+```bash
+conda env create
+source activate bdaybot
+```
 
 [python-version]:https://img.shields.io/badge/python-3.6%2B-brightgreen.svg
 [issues-image]:https://img.shields.io/github/issues/clamytoe/bdaybot.svg
