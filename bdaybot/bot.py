@@ -88,14 +88,21 @@ def parse_message(message):
 def process_birth_date(birth_date, channel, user_name):
     if birth_date:
         current_birth_date = lookup_birthday(user_name)
-        if current_birth_date and current_birth_date is not birth_date:
+        if current_birth_date:
+            if current_birth_date == birth_date:
+                response = f"I already have you're birth date set to {birth_date}."
+            else:
+                status = add_date(user_name, birth_date)
+                if status:
+                    response = f'Previous birthday of {current_birth_date} has been updated to {birth_date}.'
+                else:
+                    response = f'Sorry, I was unable to update your birthday from {current_birth_date} to {birth_date}.'
+        else:
             status = add_date(user_name, birth_date)
             if status:
-                response = f'Previous birthday of {current_birth_date} has been updated to {birth_date}.'
+                response = f'Thank you for adding {birth_date} as your birthday!'
             else:
-                response = f'Sorry, I was unable to update your birthday from {current_birth_date} to {birth_date}. '
-        else:
-            response = f"I already have you're birth date set to {birth_date}."
+                response = f'Sorry, I was unable to add your birthday of {birth_date} to my list.'
     else:
         response = 'I was unable to find a valid date, please try again.'
     # post the message
