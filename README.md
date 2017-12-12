@@ -1,2 +1,24 @@
-# bdaybot
-Slack birthday greeting bot.
+# Birthday Bot (*bdaybot*)
+> Slack birthday management and greeting bot.
+
+The concept is simple. Tell the bot your birthday and when it comes around, get a nice little birthday message.
+
+![Python version][python-version]
+[![GitHub issues][issues-image]][issues-url]
+[![GitHub forks][fork-image]][fork-url]
+[![GitHub Stars][stars-image]][stars-url]
+[![License][license-image]][license-url]
+
+## Initial Design Concept
+![flowchart](img/flowchart.png)
+
+
+[python-version]:https://img.shields.io/badge/python-3.6%2B-brightgreen.svg
+[issues-image]:https://img.shields.io/github/issues/clamytoe/bdaybot.svg
+[issues-url]:https://github.com/clamytoe/bdaybot/issues
+[fork-image]:https://img.shields.io/github/forks/clamytoe/bdaybot.svg
+[fork-url]:https://github.com/clamytoe/bdaybot/network
+[stars-image]:https://img.shields.io/github/stars/clamytoe/bdaybot.svg
+[stars-url]:https://github.com/clamytoe/bdaybot/stargazers
+[license-image]:https://img.shields.io/github/license/clamytoe/bdaybot.svg
+[license-url]:https://github.com/clamytoe/bdaybot/blob/master/LICENSE
