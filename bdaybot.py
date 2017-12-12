@@ -1,5 +1,8 @@
 import time
+from dateutil import parser
 from functools import lru_cache
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 from slackclient import SlackClient
 from config import BOT_ID, SLACK_BOT_TOKEN
 
@@ -82,7 +85,10 @@ def post_message(response, channel):
 
 def parse_message(message):
     # TODO: Parse the message for a date and returns it otherwise return None
-    pass
+    stop_words = set(stopwords.words('english'))
+    word_tokens = word_tokenize(message)
+    filtered_sentence = [w for w in word_tokens if not w in stop_words]
+    print(filtered_sentence)
 
 
 def process_birth_date(birth_date, channel, user_name):
