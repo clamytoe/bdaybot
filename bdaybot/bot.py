@@ -86,6 +86,14 @@ def parse_message(message):
 
 
 def process_birth_date(birth_date, channel, user_name):
+    """
+    Processes the given date and returns the proper response to the channel.
+
+    :param birth_date: datetime object
+    :param channel: String - the channel were the birthday was posted
+    :param user_name: String - the user name of the person entering/changing their birthday
+    :return: None - message is posted to the channel
+    """
     if birth_date:
         current_birth_date = lookup_birthday(user_name)
         if current_birth_date:
@@ -100,11 +108,12 @@ def process_birth_date(birth_date, channel, user_name):
         else:
             status = add_date(user_name, birth_date)
             if status:
-                response = f'Thank you for adding {birth_date} as your birthday!'
+                response = f"Thanks, I've saved {birth_date} as your birthday!"
             else:
                 response = f'Sorry, I was unable to add your birthday of {birth_date} to my list.'
     else:
         response = 'I was unable to find a valid date, please try again.'
+
     # post the message
     post_message(response, channel)
 
