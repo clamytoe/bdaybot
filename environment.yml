@@ -2,7 +2,9 @@ name: bdaybot
 channels:
 - defaults
 dependencies:
-- pytest
-- python=3.6.*
+- nltk=3.2.5
+- pytest=3.3.0
+- python=3.6.3
+- python-dateutil=2.6.1
 - pip:
-  - slackclient
+  - slackclient==1.1.0
