@@ -1,0 +1,11 @@
+name: bdaybot
+channels:
+- defaults
+dependencies:
+- beautifulsoup4
+- pytest
+- python=3.6.*
+- pip:
+  - requests
+  - slackclient
+

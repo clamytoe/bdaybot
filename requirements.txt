@@ -1,0 +1,4 @@
+beautifulsoup4==4.6.0
+pytest==3.2.5
+requests==2.18.4
+slackclient==1.1.0
