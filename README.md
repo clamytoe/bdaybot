@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ### Anaconda Development Environment
 
 ```bash
-conda env create
+conda env create -f environment.yml
 source activate bdaybot
 ```
 
