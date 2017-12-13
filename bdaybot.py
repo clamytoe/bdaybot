@@ -1,8 +1,7 @@
 import time
-from dateutil import parser
+import arrow
+from dateutil.parser import parse
 from functools import lru_cache
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from slackclient import SlackClient
 from config import BOT_ID, SLACK_BOT_TOKEN
 
@@ -84,11 +83,18 @@ def post_message(response, channel):
 
 
 def parse_message(message):
-    # TODO: Parse the message for a date and returns it otherwise return None
-    stop_words = set(stopwords.words('english'))
-    word_tokens = word_tokenize(message)
-    filtered_sentence = [w for w in word_tokens if not w in stop_words]
-    print(filtered_sentence)
+    """
+    Attempts to parse a date from the message.
+
+    :param message: String containing the message from the user
+    :return: datetime.datetime object containing the date or None
+    """
+    try:
+        b_day = parse(message, fuzzy=True)
+        print(b_day)
+        return b_day
+    except ValueError:
+        return None
 
 
 def process_birth_date(birth_date, channel, user_name):
