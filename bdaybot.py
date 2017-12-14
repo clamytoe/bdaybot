@@ -19,28 +19,19 @@ def add_date(user_name, birth_date, timezone):
 
 
 def days_left_to_birthday(birth_date, timezone):
+    """
+    Determines how many days are left until the user's next birthday.
+
+    :param birth_date: Arrow datetime object with the user's birthday
+    :param timezone: String with the timezone of the user
+    :return: Integer with the number of days left until the next birthday
+    """
     today = arrow.utcnow()
     today.to(timezone)
-    past = False
-    next_birth_date = None
+    next_birth_date = arrow.get(f'{today.year}-{birth_date.month}-{birth_date.day}')
 
-    if today.month > birth_date.month:
-        # birthday has already passed, must calculate for next year
-        past = True
-    elif today.month == birth_date.month:
-        # the birthday is this month
-        if today.day > birth_date.day:
-            # we missed it!
-            past = True
-        elif today.day == birth_date.day:
-            next_birth_date = today
-
-    if next_birth_date == today:
-        return 0
-    elif past:
+    if (next_birth_date - today).days < 0:
         next_birth_date = arrow.get(f'{today.year + 1}-{birth_date.month}-{birth_date.day}')
-    else:
-        next_birth_date = arrow.get(f'{today.year}-{birth_date.month}-{birth_date.day}')
 
     days_left = (next_birth_date - today).days
     return days_left
@@ -128,7 +119,7 @@ def parse_message(message, timezone):
         return None
 
 
-def process_birth_date(birth_date, channel, user_name):
+def process_birth_date(birth_date, channel, user_name, timezone):
     """
     Processes the given date and returns the proper response to the channel.
 
@@ -143,13 +134,13 @@ def process_birth_date(birth_date, channel, user_name):
             if current_birth_date == birth_date:
                 response = f"I already have you're birth date set to {birth_date}."
             else:
-                status = add_date(user_name, birth_date)
+                status = add_date(user_name, birth_date, timezone)
                 if status:
                     response = f'Previous birthday of {current_birth_date} has been updated to {birth_date}.'
                 else:
                     response = f'Sorry, I was unable to update your birthday from {current_birth_date} to {birth_date}.'
         else:
-            status = add_date(user_name, birth_date)
+            status = add_date(user_name, birth_date, timezone)
             if status:
                 response = f"Thanks, I've saved {birth_date} as your birthday!"
             else:
@@ -173,7 +164,7 @@ def run_bot():
             (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
             if message and channel:
                 birth_date = parse_message(message, timezone)
-                process_birth_date(birth_date, channel, user_name)
+                process_birth_date(birth_date, channel, user_name, timezone)
             time.sleep(READ_DELAY)
     else:
         print('Connection failed, invalid Slack TOKEN or bot ID?')
