@@ -1,6 +1,7 @@
 import time
 import arrow
 from dateutil.parser import parse
+from dateutil import tz
 from functools import lru_cache
 from slackclient import SlackClient
 from config import BOT_ID, SLACK_BOT_TOKEN
@@ -12,12 +13,40 @@ AT_BOT = f'<@{BOT_ID}>'
 READ_DELAY = 1
 
 
-def add_date(user_name, birth_date):
+def add_date(user_name, birth_date, timezone):
     # TODO: Add/Modify the birth date for the user, return True if successful
     pass
 
 
-def calculate_age(birth_date):
+def days_left_to_birthday(birth_date, timezone):
+    today = arrow.utcnow()
+    today.to(timezone)
+    past = False
+    next_birth_date = None
+
+    if today.month > birth_date.month:
+        # birthday has already passed, must calculate for next year
+        past = True
+    elif today.month == birth_date.month:
+        # the birthday is this month
+        if today.day > birth_date.day:
+            # we missed it!
+            past = True
+        elif today.day == birth_date.day:
+            next_birth_date = today
+
+    if next_birth_date == today:
+        return 0
+    elif past:
+        next_birth_date = arrow.get(f'{today.year + 1}-{birth_date.month}-{birth_date.day}')
+    else:
+        next_birth_date = arrow.get(f'{today.year}-{birth_date.month}-{birth_date.day}')
+
+    days_left = (next_birth_date - today).days
+    return days_left
+
+
+def calculate_age(birth_date, timezone):
     # TODO: Returns an age based on today's date and the birth date given
     pass
 
@@ -43,7 +72,8 @@ def lookup_user(user_id):
     """
     user_info = SLACK_CLIENT.api_call('users.info', user=user_id)
     user_name = f'@{user_info["user"]["name"]}'
-    return user_name
+    user_tz = f'{user_info["user"]["tz"]}'
+    return user_name, user_tz
 
 
 def parse_slack_output(slack_rtm_output):
@@ -53,7 +83,7 @@ def parse_slack_output(slack_rtm_output):
     Returns None unless a message is directed at the Bot, based on its ID.
 
     :param slack_rtm_output: List - contents of RTM Slack Read
-    :return: Tuple - (None, None, None) or (message, channel, username)
+    :return: Tuple - (None, None, None, None) or (message, channel, username, timezone)
     """
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
@@ -61,9 +91,9 @@ def parse_slack_output(slack_rtm_output):
             if output and 'text' in output and AT_BOT in output['text']:
                 message = output['text'].split(AT_BOT)[1].strip().lower()
                 channel = output['channel']
-                username = lookup_user(output['user'])
-                return message, channel, username
-    return None, None, None
+                username, timezone = lookup_user(output['user'])
+                return message, channel, username, timezone
+    return None, None, None, None
 
 
 def pick_random_message():
@@ -82,7 +112,7 @@ def post_message(response, channel):
     SLACK_CLIENT.api_call('chat.postMessage', channel=channel, text=response, as_user=True)
 
 
-def parse_message(message):
+def parse_message(message, timezone):
     """
     Attempts to parse a date from the message.
 
@@ -91,8 +121,9 @@ def parse_message(message):
     """
     try:
         b_day = parse(message, fuzzy=True)
-        print(b_day)
-        return b_day
+        birthday = arrow.get(b_day, tz.gettz(timezone))
+        print(birthday)
+        return birthday
     except ValueError:
         return None
 
@@ -139,9 +170,9 @@ def run_bot():
     if SLACK_CLIENT.rtm_connect():
         print('Bot connected and running!')
         while True:
-            (message, channel, user_name) = parse_slack_output(SLACK_CLIENT.rtm_read())
+            (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
             if message and channel:
-                birth_date = parse_message(message)
+                birth_date = parse_message(message, timezone)
                 process_birth_date(birth_date, channel, user_name)
             time.sleep(READ_DELAY)
     else:
