@@ -15,7 +15,7 @@ READ_DELAY = 1
 
 def add_date(user_name, birth_date, timezone):
     # TODO: Add/Modify the birth date for the user, return True if successful
-    return True
+    pass
 
 
 def days_left_to_birthday(birth_date, timezone):
@@ -26,10 +26,14 @@ def days_left_to_birthday(birth_date, timezone):
     :param timezone: String with the timezone of the user
     :return: Integer with the number of days left until the next birthday
     """
-    today = arrow.utcnow().floor('hour').to(timezone)  # discards the time
+    today = arrow.utcnow().to(timezone).floor('hour')  # discards the time
     next_birth_date = birth_date.replace(year=today.year)
+    str_today = str(today).split('T')[0]
+    str_next_birth_date = str(next_birth_date).split('T')[0]
 
-    if next_birth_date < today:
+    if str_next_birth_date == str_today:
+        return 0
+    elif next_birth_date < today:
         next_birth_date = next_birth_date.shift(years=1)
 
     return (next_birth_date - today).days
@@ -117,6 +121,10 @@ def parse_message(message, timezone):
         return None
 
 
+def pp_date(date):
+    return date.format('MMMM D, YYYY')
+
+
 def process_birth_date(birth_date, channel, user_name, timezone):
     """
     Processes the given date and returns the proper response to the channel.
@@ -127,26 +135,32 @@ def process_birth_date(birth_date, channel, user_name, timezone):
     :return: None - message is posted to the channel
     """
     if birth_date:
+        countdown = days_left_to_birthday(birth_date, timezone)
         current_birth_date = lookup_birthday(user_name)
-        if current_birth_date:
+        pp_bday = pp_date(birth_date)
+
+        if countdown == 0:
+            response = f":gift: Hey!, today is your BIRTHDAY!! :cake:"
+        elif current_birth_date:
+            pp_current = pp_date(current_birth_date)
             if current_birth_date == birth_date:
-                response = f"I already have you're birth date set to {birth_date}."
+                response = f":confused: I already have your birthday set. You still have {countdown} days more, " \
+                           f"so please be patient! :ok_hand:"
             else:
                 status = add_date(user_name, birth_date, timezone)
                 if status:
-                    response = f'Previous birthday of {current_birth_date} has been updated to {birth_date}.'
+                    response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
                 else:
-                    response = f'Sorry, I was unable to update your birthday from {current_birth_date} to {birth_date}.'
+                    response = f"Sorry but I couldn't change your birthday from *{pp_current}* to *{pp_bday}*."
         else:
             status = add_date(user_name, birth_date, timezone)
             if status:
-                countdown = days_left_to_birthday(birth_date, timezone)
-                response = f"Thanks, I've saved {birth_date.format('MMMM D, YYYY')} as your birthday. You will " \
-                           f"hear again from me in {countdown} days! :wink:"
+                response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
+                           f"hear again from me in *{countdown}* days! :wink:"
             else:
-                response = f'Sorry, I was unable to add your birthday of {birth_date} to my list.'
+                response = f"Sorry, but for some unknown reason, I wasn't able to add *{pp_bday}* as your birthday..."
     else:
-        response = 'I was unable to find a valid date, please try again.'
+        response = ":thinking_face:, was there a date in there?"
 
     # post the message
     post_message(response, channel)
