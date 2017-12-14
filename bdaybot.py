@@ -141,8 +141,8 @@ def process_birth_date(birth_date, channel, user_name, timezone):
             status = add_date(user_name, birth_date, timezone)
             if status:
                 countdown = days_left_to_birthday(birth_date, timezone)
-                response = f"Thanks, I've saved {birth_date} as your birthday. You will hear again from me in " \
-                           f"{countdown} days! :wink:"
+                response = f"Thanks, I've saved {birth_date.format('MMMM D, YYYY')} as your birthday. You will " \
+                           f"hear again from me in {countdown} days! :wink:"
             else:
                 response = f'Sorry, I was unable to add your birthday of {birth_date} to my list.'
     else:
