@@ -143,7 +143,7 @@ def process_birth_date(birth_date, channel, user_name, timezone):
             response = f":gift: Hey!, today is your BIRTHDAY!! :cake:"
         elif current_birth_date:
             pp_current = pp_date(current_birth_date)
-            if current_birth_date == birth_date:
+            if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
                 response = f":confused: I already have your birthday set. You still have {countdown} days more, " \
                            f"so please be patient! :ok_hand:"
             else:
