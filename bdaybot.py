@@ -15,7 +15,7 @@ READ_DELAY = 1
 
 def add_date(user_name, birth_date, timezone):
     # TODO: Add/Modify the birth date for the user, return True if successful
-    pass
+    return True
 
 
 def days_left_to_birthday(birth_date, timezone):
@@ -26,15 +26,15 @@ def days_left_to_birthday(birth_date, timezone):
     :param timezone: String with the timezone of the user
     :return: Integer with the number of days left until the next birthday
     """
-    today = arrow.utcnow()
+    today = arrow.utcnow().floor('day')  # discards the time
     today.to(timezone)
     next_birth_date = arrow.get(f'{today.year}-{birth_date.month}-{birth_date.day}')
 
-    if (next_birth_date - today).days < 0:
-        next_birth_date = arrow.get(f'{today.year + 1}-{birth_date.month}-{birth_date.day}')
+    if next_birth_date < today:
+        next_birth_date = next_birth_date.shift(years=1)
 
-    days_left = (next_birth_date - today).days
-    return days_left
+    return (next_birth_date - today).days
+
 
 
 def calculate_age(birth_date, timezone):
@@ -113,7 +113,6 @@ def parse_message(message, timezone):
     try:
         b_day = parse(message, fuzzy=True)
         birthday = arrow.get(b_day, tz.gettz(timezone))
-        print(birthday)
         return birthday
     except ValueError:
         return None
@@ -142,7 +141,10 @@ def process_birth_date(birth_date, channel, user_name, timezone):
         else:
             status = add_date(user_name, birth_date, timezone)
             if status:
-                response = f"Thanks, I've saved {birth_date} as your birthday!"
+                # response = f"Thanks, I've saved {birth_date} as your birthday!"
+                countdown = days_left_to_birthday(birth_date, timezone)
+                response = f'Although you were born {birth_date.humanize()} and have {countdown} left for your next birthday, ' \
+                           f'I am unable to add {birth_date} into my records at this time.'
             else:
                 response = f'Sorry, I was unable to add your birthday of {birth_date} to my list.'
     else:
