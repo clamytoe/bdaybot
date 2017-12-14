@@ -26,13 +26,12 @@ def days_left_to_birthday(birth_date, timezone):
     :param timezone: String with the timezone of the user
     :return: Integer with the number of days left until the next birthday
     """
-    today = arrow.utcnow().floor('day')  # discards the time
-    today.to(timezone)
-    next_birth_date = arrow.get(f'{today.year}-{birth_date.month}-{birth_date.day}')
+    today = arrow.utcnow().floor('hour').to(timezone)  # discards the time
+    next_birth_date = birth_date.replace(year=today.year)
 
     if next_birth_date < today:
         next_birth_date = next_birth_date.shift(years=1)
-
+        
     return (next_birth_date - today).days
 
 
@@ -143,8 +142,8 @@ def process_birth_date(birth_date, channel, user_name, timezone):
             if status:
                 # response = f"Thanks, I've saved {birth_date} as your birthday!"
                 countdown = days_left_to_birthday(birth_date, timezone)
-                response = f'Although you were born {birth_date.humanize()} and have {countdown} left for your next birthday, ' \
-                           f'I am unable to add {birth_date} into my records at this time.'
+                response = f'Although you were born {birth_date.humanize()} and have {countdown} days left for your ' \
+                           f'next birthday, I am unable to add {birth_date} into my records at this time.'
             else:
                 response = f'Sorry, I was unable to add your birthday of {birth_date} to my list.'
     else:
