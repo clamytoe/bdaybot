@@ -28,10 +28,10 @@ def add_date(user_name, birth_date, timezone):
     """
     current_bday = lookup_birthday(user_name)[0]
     if current_bday:
-        update_status = db.modify_birthday(user_name, birth_date, timezone)
+        update_status = db.modify_birthday(user_name, birth_date.datetime, timezone)
         return update_status if update_status else False
     else:
-        status = db.create_birthday(user_name, birth_date, timezone)
+        status = db.create_birthday(user_name, birth_date.datetime, timezone)
     return status
 
 
@@ -67,7 +67,6 @@ def check_for_upcoming_birth_dates():
     pass
 
 
-@lru_cache(maxsize=128)
 def lookup_birthday(user_name):
     """
     Retrieves the user's birthday and timezone from the database
@@ -88,7 +87,7 @@ def lookup_user(user_id):
     :return: String - Username of the user
     """
     user_info = SLACK_CLIENT.api_call('users.info', user=user_id)
-    user_name = f'@{user_info["user"]["name"]}'
+    user_name = f'{user_info["user"]["name"]}'
     user_tz = f'{user_info["user"]["tz"]}'
     return user_name, user_tz
 
@@ -168,6 +167,8 @@ def pp_date(date):
     :param date: Arrow datetime - User's birthday
     :return: String - Human readable formatted date
     """
+    if not isinstance(date, arrow.arrow.Arrow):
+        date = arrow.get(date)
     return date.format('MMMM D, YYYY')
 
 
@@ -191,7 +192,7 @@ def process_birth_date(birth_date, channel, user_name, timezone):
         elif current_birth_date:
             pp_current = pp_date(current_birth_date)
             if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
-                response = f":confused: I already have your birthday set. You still have {countdown} days more, " \
+                response = f":confused: I already have your birthday set. You still have *{countdown}* days more, " \
                            f"so please be patient! :ok_hand:"
             else:
                 status = add_date(user_name, birth_date, timezone)
