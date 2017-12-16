@@ -119,7 +119,7 @@ def delete_birthday(user):
     :return: bool - True if succesful, else False
     """
     try:
-        with session_scope as session:
+        with session_scope() as session:
             res = session.query(Birthday).filter(Birthday.username == user).first()
             if not res:
                 return False
@@ -182,7 +182,7 @@ def delete_reminder(r_id):
     :return: bool - True if succesful, else False
     """
     try:
-        with session_scope as session:
+        with session_scope() as session:
             res = session.query(Reminder).filter(Reminder.id == r_id).first()
             if not res:
                 return False
