@@ -218,6 +218,19 @@ def process_birth_date(birth_date, channel, user_name, timezone):
     post_message(response, channel)
 
 
+def display_help(channel):
+    """
+    Displays a help message with the list of admitted commands
+
+    :param channel: String - The channel where the response should be posted
+    :return: None
+    """
+    response = "Tag me and say 'help' to display this message again.\n" \
+               "Tag me and say 'birthday' <your-birth-date-here> (sans the '<' and '>') for me to register" \
+               " your birthday, I will take your timzone into account!."
+    post_message(response, channel)
+
+
 def run_bot():
     """
     Starts the bot.
@@ -230,8 +243,8 @@ def run_bot():
             (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
             if not channel:
                 pass
-            elif "help" in message:
-                display_help()
+            elif "help" in message.lower():
+                display_help(channel)
             elif "birthday" in message:
                 birth_date = parse_message(message, timezone)
                 process_birth_date(birth_date, channel, user_name, timezone)
