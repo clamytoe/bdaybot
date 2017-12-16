@@ -220,7 +220,7 @@ def parse_message(message, timezone):
         b_day = parse(message, fuzzy=True)
         birthday = arrow.get(b_day, tz.gettz(timezone))
         return birthday
-    except ValueError:
+    except (ValueError, TypeError):
         return None
 
 
@@ -272,7 +272,7 @@ def display_help(channel):
     """
     response = "Tag me and say 'help' to display this message again.\n" \
                "Tag me and say 'birthday' <your-birth-date-here> (sans the '<' and '>') for me to register" \
-               " your birthday, I will take your timzone into account!."
+               " your birthday, I will take your timezone into account!."
     post_message(response, channel)
 
 
@@ -286,13 +286,19 @@ def run_bot():
         print('Bot connected and running!')
         while True:
             (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
-            if not channel:
-                pass
-            elif "help" in message.lower():
-                display_help(channel)
-            elif "birthday" in message:
+            if message and channel:
                 birth_date = parse_message(message, timezone)
-                process_birth_date(birth_date, channel, user_name, timezone)
+                current_birth_date = lookup_birthday(user_name)[0]
+                if "help" in message.lower():
+                    display_help(channel)
+                elif "birthday" in message and birth_date:
+                    process_birth_date(birth_date, channel, user_name, timezone)
+                elif "birthday" in message and current_birth_date:
+                    current = arrow.get(current_birth_date)
+                    countdown = days_left_to_birthday(current, timezone)
+                    days = 'day' if countdown <= 1 else 'days'
+                    response = f"You have *{countdown}* {days} left to your birthday!"
+                    post_message(response, channel)
             time.sleep(READ_DELAY)
     else:
         print('Connection failed, invalid Slack TOKEN or bot ID?')
