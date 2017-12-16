@@ -1,4 +1,5 @@
 from random import choice
+import datetime
 import time
 from dateutil.parser import parse
 from dateutil import tz
@@ -6,6 +7,7 @@ from functools import lru_cache
 
 import arrow
 from slackclient import SlackClient
+from apscheduler.schedulers.background import BackgroundScheduler
 
 import bd_db as db
 from config import BOT_ID, SLACK_BOT_TOKEN
@@ -247,12 +249,9 @@ def process_birth_date(birth_date, channel, user_name, timezone):
     :return: None - message is posted to the channel
     """
     if birth_date:
-        countdown = days_left_to_birthday(birth_date, timezone)
         current_birth_date = lookup_birthday(user_name)[0]
 
-        if countdown == 0:
-            response = handle_birthday_event(user_name, birth_date, timezone)
-        elif current_birth_date:
+        if current_birth_date:
             response = handle_user_exists(user_name, birth_date, timezone, current_birth_date, countdown)
         else:
             response = handle_add_new_user(user_name, birth_date, timezone, countdown)
@@ -276,6 +275,22 @@ def display_help(channel):
     post_message(response, channel)
 
 
+def reminders_check():
+    reminders = db.get_all_reminder_ids()
+    if not reminders:
+        return
+    for r_id in reminders:
+        r_user, r_date = db.retrieve_reminder_date(r_id)
+        r_date = arrow.get(r_date)
+        if r_date.datetime.day == arrow.now().datetime.day:
+            # TODO: here we should call the function that greets the "r_user"
+            pass
+            # then we delete the expired reminder
+            # db.delete_reminder(r_id)
+            # and after that, we set up next year's reminder
+            # db.create_reminder(r_user, r_date.shift(years=1))
+
+
 def run_bot():
     """
     Starts the bot.
@@ -284,6 +299,11 @@ def run_bot():
     """
     if SLACK_CLIENT.rtm_connect():
         print('Bot connected and running!')
+
+        reminders_scheduler = BackgroundScheduler()
+        reminders_scheduler.add_job(reminders_check, 'cron', hour='*', minute=0)
+        reminders_scheduler.start()
+
         while True:
             (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
             if message and channel:
