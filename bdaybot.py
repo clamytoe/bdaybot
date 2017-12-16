@@ -182,7 +182,7 @@ def process_birth_date(birth_date, channel, user_name, timezone):
     """
     if birth_date:
         countdown = days_left_to_birthday(birth_date, timezone)
-        current_birth_date = lookup_birthday(user_name)
+        current_birth_date = lookup_birthday(user_name)[0]
         pp_bday = pp_date(birth_date)
 
         if countdown == 0:
