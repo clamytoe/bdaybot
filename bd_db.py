@@ -82,13 +82,12 @@ def create_birthday(user, birth_date, timezone):
     :return: bool - True if succesful, else False
     """
     new_birthday = Birthday(user, birth_date, timezone)
-    with session_scope() as session:
-        session.add(new_birthday)
-        session.commit()
-        res = session.query(Birthday).filter(Birthday.username == user).first()
-        if not res:
-            return False
+    try:
+        with session_scope() as session:
+            session.add(new_birthday)
         return True
+    except:
+        return False
 
 
 def modify_birthday(user, birth_date, timezone):
@@ -100,14 +99,16 @@ def modify_birthday(user, birth_date, timezone):
 
     :return: bool - True if succesful, else False
     """
-    with session_scope() as session:
-        res = session.query(Birthday).filter(Birthday.username == user).first()
-        if not res:
-            return False
-        res.birth_date = birth_date
-        res.timezone = timezone
-        session.commit()
+    try:
+        with session_scope() as session:
+            res = session.query(Birthday).filter(Birthday.username == user).first()
+            if not res:
+                return False
+            res.birth_date = birth_date
+            res.timezone = timezone
         return True
+    except:
+        return False
 
 
 def delete_birthday(user):
@@ -117,13 +118,15 @@ def delete_birthday(user):
 
     :return: bool - True if succesful, else False
     """
-    with session_scope as session:
-        res = session.query(Birthday).filter(Birthday.username == user).first()
-        if not res:
-            return False
-        session.delete(res)
-        session.commit()
+    try:
+        with session_scope as session:
+            res = session.query(Birthday).filter(Birthday.username == user).first()
+            if not res:
+                return False
+            session.delete(res)
         return True
+    except:
+        return False
 
 
 def retrieve_user_data(user):
@@ -163,13 +166,12 @@ def create_reminder(user, birthday):
     :return: bool - True if succesful, else False
     """
     new_reminder = Reminder(user, birthday)
-    with session_scope() as session:
-        session.add(new_reminder)
-        session.commit()
-        res = session.query(Reminder).filter(Reminder.username == user, Reminder.birthday == birthday).first()
-        if not res:
-            return False
+    try:
+        with session_scope() as session:
+            session.add(new_reminder)
         return True
+    except:
+        return False
 
 
 def delete_reminder(r_id):
@@ -179,10 +181,12 @@ def delete_reminder(r_id):
 
     :return: bool - True if succesful, else False
     """
-    with session_scope as session:
-        res = session.query(Reminder).filter(Reminder.id == r_id).first()
-        if not res:
-            return False
-        session.delete(res)
-        session.commit()
+    try:
+        with session_scope as session:
+            res = session.query(Reminder).filter(Reminder.id == r_id).first()
+            if not res:
+                return False
+            session.delete(res)
         return True
+    except:
+        return False
