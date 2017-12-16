@@ -192,7 +192,8 @@ def pick_random_message():
         'Let’s light the candles and celebrate this special day of your life. Happy birthday.',
         'Special day, special person and special celebration. May all your dreams and desires come true in this '
         'coming year. Happy birthday.',
-        'Let your all the dreams to be on fire and light your birthday candles with that. Have a gorgeous birthday.',
+        'If you truly believe in yourself, everybody will believe in you too. I believe you have what it takes to '
+        'succeed at anything. Happy birthday!',
     ]
     return choice(greetings)
 
