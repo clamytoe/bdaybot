@@ -228,7 +228,11 @@ def run_bot():
         print('Bot connected and running!')
         while True:
             (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
-            if message and channel:
+            if not channel:
+                pass
+            elif "help" in message:
+                display_help()
+            elif "birthday" in message:
                 birth_date = parse_message(message, timezone)
                 process_birth_date(birth_date, channel, user_name, timezone)
             time.sleep(READ_DELAY)
