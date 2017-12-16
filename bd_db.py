@@ -69,5 +69,5 @@ def delete_birthday(user):
 def retrieve_user_data(user):
     res = session.query(Birthday).filter(Birthday.username == user).first()
     if not res:
-        return False
+        return None, None
     return res.birth_date, res.timezone
