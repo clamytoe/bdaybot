@@ -18,8 +18,21 @@ READ_DELAY = 1
 
 
 def add_date(user_name, birth_date, timezone):
-    # TODO: Add/Modify the birth date for the user, return True if successful
-    pass
+    """
+    Add a user to the database if it doesn't exist. Change their birthday if a new date is given.
+
+    :param user_name: String - User name
+    :param birth_date: Arrow datetime - User's birthday
+    :param timezone: String - Timezone for the user
+    :return: Bool - True or False
+    """
+    current_bday = lookup_birthday(user_name)[0]
+    if current_bday:
+        update_status = db.modify_birthday(user_name, birth_date, timezone)
+        return update_status if update_status else False
+    else:
+        status = db.create_birthday(user_name, birth_date, timezone)
+    return status
 
 
 def days_left_to_birthday(birth_date, timezone):
@@ -63,7 +76,7 @@ def lookup_birthday(user_name):
     :return: Tuple - (birth_date, timezone) or None
     """
     birth_date, timezone = db.retrieve_user_data(user_name)
-    return birth_date, timezone if birth_date and timezone else None
+    return birth_date, timezone if birth_date and timezone else None, None
 
 
 @lru_cache(maxsize=128)
