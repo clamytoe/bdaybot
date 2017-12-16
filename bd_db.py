@@ -190,3 +190,23 @@ def delete_reminder(r_id):
         return True
     except:
         return False
+
+
+def get_all_reminder_ids():
+    """Retrieves all existing reminders
+    """
+    with session_scope() as session:
+        res = session.query(Reminder).all()
+        if not res:
+            return None
+        return [reminder.id for reminder in res]
+
+
+def retrieve_reminder_date(r_id):
+    """Retrieves the data of the reminder with the provided id
+    """
+    with session_scope() as session:
+        res = session.query(Reminder).filter(Reminder.id == r_id).first()
+        if not res:
+            return None
+        return res.username, res.birthday
