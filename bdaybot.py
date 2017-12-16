@@ -1,9 +1,12 @@
+from random import choice
 import time
-import arrow
 from dateutil.parser import parse
 from dateutil import tz
 from functools import lru_cache
+
+import arrow
 from slackclient import SlackClient
+
 from config import BOT_ID, SLACK_BOT_TOKEN
 
 # connect to the Slack API
