@@ -1,9 +1,13 @@
+from random import choice
 import time
-import arrow
 from dateutil.parser import parse
 from dateutil import tz
 from functools import lru_cache
+
+import arrow
 from slackclient import SlackClient
+
+import bd_db as db
 from config import BOT_ID, SLACK_BOT_TOKEN
 
 # connect to the Slack API
@@ -14,8 +18,21 @@ READ_DELAY = 1
 
 
 def add_date(user_name, birth_date, timezone):
-    # TODO: Add/Modify the birth date for the user, return True if successful
-    pass
+    """
+    Add a user to the database if it doesn't exist. Change their birthday if a new date is given.
+
+    :param user_name: String - User name
+    :param birth_date: Arrow datetime - User's birthday
+    :param timezone: String - Timezone for the user
+    :return: Bool - True or False
+    """
+    current_bday = lookup_birthday(user_name)[0]
+    if current_bday:
+        update_status = db.modify_birthday(user_name, birth_date.datetime, timezone)
+        return update_status if update_status else False
+    else:
+        status = db.create_birthday(user_name, birth_date.datetime, timezone)
+    return status
 
 
 def days_left_to_birthday(birth_date, timezone):
@@ -50,10 +67,15 @@ def check_for_upcoming_birth_dates():
     pass
 
 
-@lru_cache(maxsize=128)
 def lookup_birthday(user_name):
-    # TODO: Return birthday for user_name if exists, otherwise return None
-    pass
+    """
+    Retrieves the user's birthday and timezone from the database
+
+    :param user_name: String - User name
+    :return: Tuple - (birth_date, timezone) or None
+    """
+    birth_date, timezone = db.retrieve_user_data(user_name)
+    return birth_date, timezone if birth_date and timezone else None, None
 
 
 @lru_cache(maxsize=128)
@@ -65,7 +87,7 @@ def lookup_user(user_id):
     :return: String - Username of the user
     """
     user_info = SLACK_CLIENT.api_call('users.info', user=user_id)
-    user_name = f'@{user_info["user"]["name"]}'
+    user_name = f'{user_info["user"]["name"]}'
     user_tz = f'{user_info["user"]["tz"]}'
     return user_name, user_tz
 
@@ -91,8 +113,25 @@ def parse_slack_output(slack_rtm_output):
 
 
 def pick_random_message():
-    # TODO: Returns a random message from the database
-    pass
+    """
+    Returns a random birthday greeting.
+
+    :return: String - a birthday greeting
+    """
+    greetings = [
+        'I hope your special day will bring you lots of happiness, love and fun. You deserve them a lot. Enjoy!',
+        'Have a wonderful birthday. I wish your every day to be filled with lots of love, laughter, happiness and the '
+        'warmth of sunshine.',
+        'May your coming year surprise you with the happiness of smiles, the feeling of love and so on. I hope you '
+        'will find plenty of sweet memories to cherish forever. Happy birthday.',
+        'May this birthday be filled with lots of happy hours and also your life with many happy birthdays, '
+        'that are yet to come. Happy birthday.',
+        'Let’s light the candles and celebrate this special day of your life. Happy birthday.',
+        'Special day, special person and special celebration. May all your dreams and desires come true in this '
+        'coming year. Happy birthday.',
+        'Let your all the dreams to be on fire and light your birthday candles with that. Have a gorgeous birthday.',
+    ]
+    return choice(greetings)
 
 
 def post_message(response, channel):
@@ -122,6 +161,14 @@ def parse_message(message, timezone):
 
 
 def pp_date(date):
+    """
+    Pretty print the Arrow datetime object.
+
+    :param date: Arrow datetime - User's birthday
+    :return: String - Human readable formatted date
+    """
+    if not isinstance(date, arrow.arrow.Arrow):
+        date = arrow.get(date)
     return date.format('MMMM D, YYYY')
 
 
@@ -136,15 +183,20 @@ def process_birth_date(birth_date, channel, user_name, timezone):
     """
     if birth_date:
         countdown = days_left_to_birthday(birth_date, timezone)
-        current_birth_date = lookup_birthday(user_name)
+        current_birth_date = lookup_birthday(user_name)[0]
         pp_bday = pp_date(birth_date)
 
         if countdown == 0:
-            response = f":gift: Hey!, today is your BIRTHDAY!! :cake:"
+            status = add_date(user_name, birth_date, timezone)
+            greeting = pick_random_message()
+            if status:
+                response = f":gift: Hey!, today is your BIRTHDAY!! :cake:\n{greeting}"
+            else:
+                response = f"I wasn't able to save your birth date, but Happy Birthday anyways!!"
         elif current_birth_date:
             pp_current = pp_date(current_birth_date)
             if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
-                response = f":confused: I already have your birthday set. You still have {countdown} days more, " \
+                response = f":confused: I already have your birthday set. You still have *{countdown}* days more, " \
                            f"so please be patient! :ok_hand:"
             else:
                 status = add_date(user_name, birth_date, timezone)
