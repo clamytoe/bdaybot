@@ -39,9 +39,9 @@ def days_left_to_birthday(birth_date, timezone):
     """
     Determines how many days are left until the user's next birthday.
 
-    :param birth_date: Arrow datetime object with the user's birthday
-    :param timezone: String with the timezone of the user
-    :return: Integer with the number of days left until the next birthday
+    :param birth_date: Arrow datetime - the user's birthday
+    :param timezone: String - the timezone of the user
+    :return: Integer - the number of days left until the next birthday
     """
     today = arrow.utcnow().to(timezone).floor('hour')  # discards the time
     next_birth_date = birth_date.replace(year=today.year)
@@ -56,10 +56,73 @@ def days_left_to_birthday(birth_date, timezone):
     return (next_birth_date - today).days
 
 
-
 def calculate_age(birth_date, timezone):
     # TODO: Returns an age based on today's date and the birth date given
     pass
+
+
+def handle_add_new_user(user_name, birth_date, timezone, countdown):
+    """
+    Handles the event where the user does not exists in the database.
+
+    :param user_name: String - the username of the user
+    :param birth_date: Arrow datetime - user's birth date
+    :param timezone: String - user's local timezone
+    :param countdown: Integer - days left to the user's birthday
+    :return: String - response message to the user
+    """
+    pp_bday = pp_date(birth_date)
+    status = add_date(user_name, birth_date, timezone)
+    if status:
+        response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
+                   f"hear again from me in *{countdown}* days! :wink:"
+    else:
+        response = f"Sorry, but for some unknown reason, I wasn't able to add *{pp_bday}* as your birthday..."
+    return response
+
+
+def handle_birthday_event(user_name, birth_date, timezone):
+    """
+    Handles the event where the given birth date is the same as the current date.
+
+    :param user_name: String - the username of the user
+    :param birth_date: Arrow datetime - user's birth date
+    :param timezone: String - user's local timezone
+    :return: String - response message to the user
+    """
+    status = add_date(user_name, birth_date, timezone)
+    greeting = pick_random_message()
+    if status:
+        response = f":gift: Hey!, today is your BIRTHDAY!! :cake:\n{greeting}"
+    else:
+        response = f"I wasn't able to save your birth date, but Happy Birthday anyways!!"
+    return response
+
+
+def handle_user_exists(user_name, birth_date, timezone, current_birth_date, countdown):
+    """
+    Handles the event where the user already exists in the database.
+
+    :param user_name: String - the username of the user
+    :param birth_date: Arrow datetime - user's birth date
+    :param timezone: String - user's local timezone
+    :param current_birth_date: Datetime - the birth date that is currently in the database
+    :param countdown: Integer - days left to the user's birthday
+    :return: String - response message to the user
+    """
+    pp_current = pp_date(current_birth_date)
+    pp_bday = pp_date(birth_date)
+
+    if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
+        response = f":confused: I already have your birthday set. You still have *{countdown}* days more, " \
+                   f"so please be patient! :ok_hand:"
+    else:
+        status = add_date(user_name, birth_date, timezone)
+        if status:
+            response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
+        else:
+            response = f"Sorry but I couldn't change your birthday from *{pp_current}* to *{pp_bday}*."
+    return response
 
 
 def check_for_upcoming_birth_dates():
@@ -149,8 +212,9 @@ def parse_message(message, timezone):
     """
     Attempts to parse a date from the message.
 
-    :param message: String containing the message from the user
-    :return: datetime.datetime object containing the date or None
+    :param message: String - the message from the user
+    :param timezone: String - the user's timezone
+    :return: datetime.datetime object - the date or None
     """
     try:
         b_day = parse(message, fuzzy=True)
@@ -179,38 +243,19 @@ def process_birth_date(birth_date, channel, user_name, timezone):
     :param birth_date: datetime object
     :param channel: String - the channel were the birthday was posted
     :param user_name: String - the user name of the person entering/changing their birthday
+    :param timezone: String - the user's timezone
     :return: None - message is posted to the channel
     """
     if birth_date:
         countdown = days_left_to_birthday(birth_date, timezone)
         current_birth_date = lookup_birthday(user_name)[0]
-        pp_bday = pp_date(birth_date)
 
         if countdown == 0:
-            status = add_date(user_name, birth_date, timezone)
-            greeting = pick_random_message()
-            if status:
-                response = f":gift: Hey!, today is your BIRTHDAY!! :cake:\n{greeting}"
-            else:
-                response = f"I wasn't able to save your birth date, but Happy Birthday anyways!!"
+            response = handle_birthday_event(user_name, birth_date, timezone)
         elif current_birth_date:
-            pp_current = pp_date(current_birth_date)
-            if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
-                response = f":confused: I already have your birthday set. You still have *{countdown}* days more, " \
-                           f"so please be patient! :ok_hand:"
-            else:
-                status = add_date(user_name, birth_date, timezone)
-                if status:
-                    response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
-                else:
-                    response = f"Sorry but I couldn't change your birthday from *{pp_current}* to *{pp_bday}*."
+            response = handle_user_exists(user_name, birth_date, timezone, current_birth_date, countdown)
         else:
-            status = add_date(user_name, birth_date, timezone)
-            if status:
-                response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
-                           f"hear again from me in *{countdown}* days! :wink:"
-            else:
-                response = f"Sorry, but for some unknown reason, I wasn't able to add *{pp_bday}* as your birthday..."
+            response = handle_add_new_user(user_name, birth_date, timezone, countdown)
     else:
         response = ":thinking_face:, was there a date in there?"
 
