@@ -194,6 +194,8 @@ def delete_reminder(r_id):
 
 def get_all_reminder_ids():
     """Retrieves all existing reminders
+
+    :return: List(Integer) - The list with all the reminder's ids.
     """
     with session_scope() as session:
         res = session.query(Reminder).all()
@@ -204,6 +206,8 @@ def get_all_reminder_ids():
 
 def retrieve_reminder_date(r_id):
     """Retrieves the data of the reminder with the provided id
+
+    :return: Tuple(String, DateTime) - A tuple with the username and the date of the birthday reminder.
     """
     with session_scope() as session:
         res = session.query(Reminder).filter(Reminder.id == r_id).first()
