@@ -276,6 +276,12 @@ def display_help(channel):
 
 
 def reminders_check():
+    """
+    Retrieves all reminders and compares their date with the current one.
+    If a birthday is found, it sends a birthday greeting, deletes the reminder and schedules the one for the next year.
+
+    :return: None
+    """
     reminders = db.get_all_reminder_ids()
     if not reminders:
         return
