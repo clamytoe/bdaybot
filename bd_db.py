@@ -39,15 +39,17 @@ class Reminder(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, ForeignKey('birthdays.username'))
     birthday = Column(DateTime)
+    channel = Column(String)
 
     # ----------------------------------------------------------------------
-    def __init__(self, username, birthday):
+    def __init__(self, username, birthday, channel):
         """"""
         self.username = username
         self.birthday = birthday
+        self.channel = channel
 
     def __repr__(self):
-        return f"<Reminder (username={self.username}, birthday={self.birthday}>"
+        return f"<Reminder (username={self.username}, birthday={self.birthday}, channel={self.channel})>"
 
 
 # create tables
@@ -145,16 +147,16 @@ def retrieve_user_reminders(user):
 
     :param user: String - User name
 
-    :return: List(Tuple) - (reminder id, datetime.datetime) or None if no reminders in the db
+    :return: List(Tuple) - (reminder id, datetime.datetime, channel ID) or None if no reminders in the db
     """
     with session_scope() as session:
         res = session.query(Reminder).filter(Reminder.username == user).all()
         if not res:
             return None
-        return [(reminder.id, reminder.birthday, reminder.timezone) for reminder in res]
+        return [(reminder.id, reminder.birthday, reminder.channel) for reminder in res]
 
 
-def create_reminder(user, birthday):
+def create_reminder(user, birthday, channel):
     """Creates a reminder entry for a user
 
     :param user: String - User name
@@ -162,7 +164,7 @@ def create_reminder(user, birthday):
 
     :return: bool - True if successful, else False
     """
-    new_reminder = Reminder(user, birthday)
+    new_reminder = Reminder(user, birthday, channel)
     try:
         with session_scope() as session:
             session.add(new_reminder)
@@ -201,13 +203,14 @@ def get_all_reminder_ids():
         return [reminder.id for reminder in res]
 
 
-def retrieve_reminder_date(r_id):
+def retrieve_reminder_data(r_id):
     """Retrieves the data of the reminder with the provided id
 
-    :return: Tuple(String, DateTime) - A tuple with the username and the date of the birthday reminder.
+    :return: Tuple(String, DateTime, String) - A tuple with the username, date of the birthday reminder and channel
+    where the bot will announce the birthday.
     """
     with session_scope() as session:
         res = session.query(Reminder).filter(Reminder.id == r_id).first()
         if not res:
             return None
-        return res.username, res.birthday
+        return res.username, res.birthday, res.channel
