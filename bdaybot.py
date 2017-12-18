@@ -40,8 +40,21 @@ def days_left_to_birthday(birth_date, timezone):
 
 
 def calculate_age(birth_date, timezone):
-    # TODO: Returns an age based on today's date and the birth date given
-    pass
+    """
+    Returns the age of the user given their birthday.
+
+    :param birth_date: Arrow datetime - user's birth date
+    :param timezone: String - user's local timezone
+    :return: Integer - the age of the user
+    """
+    today = arrow.utcnow().to(timezone)
+    age = today.year - birth_date.year
+
+    if birth_date.month == today.month:
+        if today.day < birth_date.day:
+            age -= 1
+
+    return age
 
 
 def handle_add_new_user(user_name, birth_date, timezone):
