@@ -29,9 +29,7 @@ class Birthday(Base):
         self.timezone = timezone
 
     def __repr__(self):
-        return "<Birthday (username={}, birth_date={}, timezone={})>".format(self.username,
-                                                                             self.birth_date,
-                                                                             self.timezone)
+        return f"<Birthday (username={self.username}, birth_date={self.birth_date}, timezone={self.timezone})>"
 
 
 class Reminder(Base):
@@ -49,8 +47,7 @@ class Reminder(Base):
         self.birthday = birthday
 
     def __repr__(self):
-        return "<Reminder (username={}, birthday={}>".format(self.username,
-                                                             self.birthday)
+        return f"<Reminder (username={self.username}, birthday={self.birthday}>"
 
 
 # create tables
@@ -79,7 +76,7 @@ def create_birthday(user, birth_date, timezone):
     :param birth_date: datetime.date - The birthday of the user
     :param timezone: String - The user's timezone
 
-    :return: bool - True if succesful, else False
+    :return: bool - True if successful, else False
     """
     new_birthday = Birthday(user, birth_date, timezone)
     try:
@@ -97,7 +94,7 @@ def modify_birthday(user, birth_date, timezone):
     :param birth_date: datetime.date - The new birthday of the user
     :param timezone: String - The user's timezone
 
-    :return: bool - True if succesful, else False
+    :return: bool - True if successful, else False
     """
     try:
         with session_scope() as session:
@@ -116,7 +113,7 @@ def delete_birthday(user):
 
     :param user: String - User name
 
-    :return: bool - True if succesful, else False
+    :return: bool - True if successful, else False
     """
     try:
         with session_scope as session:
@@ -163,7 +160,7 @@ def create_reminder(user, birthday):
     :param user: String - User name
     :param birthday: datetime.datetime - The birthday of the user, timezone-adjusted for the bot
 
-    :return: bool - True if succesful, else False
+    :return: bool - True if successful, else False
     """
     new_reminder = Reminder(user, birthday)
     try:
@@ -179,7 +176,7 @@ def delete_reminder(r_id):
 
     :param r_id: Integer - The reminder id
 
-    :return: bool - True if succesful, else False
+    :return: bool - True if successful, else False
     """
     try:
         with session_scope as session:

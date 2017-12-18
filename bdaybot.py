@@ -114,7 +114,7 @@ def lookup_birthday(user_name):
     Retrieves the user's birthday and timezone from the database
 
     :param user_name: String - User name
-    :return: Tuple - (birth_date, timezone) or None
+    :return: Tuple - (birth_date, timezone) or (None, None)
     """
     birth_date, timezone = db.retrieve_user_data(user_name)
     return birth_date, timezone if birth_date and timezone else None, None
