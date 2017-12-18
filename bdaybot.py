@@ -18,24 +18,6 @@ AT_BOT = f'<@{BOT_ID}>'
 READ_DELAY = 1
 
 
-def add_date(user_name, birth_date, timezone):
-    """
-    Add a user to the database if it doesn't exist. Change their birthday if a new date is given.
-
-    :param user_name: String - User name
-    :param birth_date: Arrow datetime - User's birthday
-    :param timezone: String - Timezone for the user
-    :return: Bool - True or False
-    """
-    current_bday = lookup_birthday(user_name)[0]
-    if current_bday:
-        update_status = db.modify_birthday(user_name, birth_date.datetime, timezone)
-        return update_status if update_status else False
-    else:
-        status = db.create_birthday(user_name, birth_date.datetime, timezone)
-    return status
-
-
 def days_left_to_birthday(birth_date, timezone):
     """
     Determines how many days are left until the user's next birthday.
@@ -62,18 +44,19 @@ def calculate_age(birth_date, timezone):
     pass
 
 
-def handle_add_new_user(user_name, birth_date, timezone, countdown):
+def handle_add_new_user(user_name, birth_date, timezone):
     """
     Handles the event where the user does not exists in the database.
 
     :param user_name: String - the username of the user
     :param birth_date: Arrow datetime - user's birth date
     :param timezone: String - user's local timezone
-    :param countdown: Integer - days left to the user's birthday
     :return: String - response message to the user
     """
+    countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
-    status = add_date(user_name, birth_date, timezone)
+    status = db.create_birthday(user_name, birth_date.datetime, timezone)
+    
     if status:
         response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
                    f"hear again from me in *{countdown}* days! :wink:"
@@ -82,25 +65,7 @@ def handle_add_new_user(user_name, birth_date, timezone, countdown):
     return response
 
 
-def handle_birthday_event(user_name, birth_date, timezone):
-    """
-    Handles the event where the given birth date is the same as the current date.
-
-    :param user_name: String - the username of the user
-    :param birth_date: Arrow datetime - user's birth date
-    :param timezone: String - user's local timezone
-    :return: String - response message to the user
-    """
-    status = add_date(user_name, birth_date, timezone)
-    greeting = pick_random_message()
-    if status:
-        response = f":gift: Hey!, today is your BIRTHDAY!! :cake:\n{greeting}"
-    else:
-        response = f"I wasn't able to save your birth date, but Happy Birthday anyways!!"
-    return response
-
-
-def handle_user_exists(user_name, birth_date, timezone, current_birth_date, countdown):
+def handle_user_exists(user_name, birth_date, timezone, current_birth_date):
     """
     Handles the event where the user already exists in the database.
 
@@ -108,17 +73,17 @@ def handle_user_exists(user_name, birth_date, timezone, current_birth_date, coun
     :param birth_date: Arrow datetime - user's birth date
     :param timezone: String - user's local timezone
     :param current_birth_date: Datetime - the birth date that is currently in the database
-    :param countdown: Integer - days left to the user's birthday
     :return: String - response message to the user
     """
-    pp_current = pp_date(current_birth_date)
+    countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
+    pp_current = pp_date(current_birth_date)
 
     if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
         response = f":confused: I already have your birthday set. You still have *{countdown}* days more, " \
                    f"so please be patient! :ok_hand:"
     else:
-        status = add_date(user_name, birth_date, timezone)
+        status = db.modify_birthday(user_name, birth_date.datetime, timezone)
         if status:
             response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
         else:
@@ -251,9 +216,9 @@ def process_birth_date(birth_date, channel, user_name, timezone):
         current_birth_date = lookup_birthday(user_name)[0]
 
         if current_birth_date:
-            response = handle_user_exists(user_name, birth_date, timezone, current_birth_date, countdown)
+            response = handle_user_exists(user_name, birth_date, timezone, current_birth_date)
         else:
-            response = handle_add_new_user(user_name, birth_date, timezone, countdown)
+            response = handle_add_new_user(user_name, birth_date, timezone)
     else:
         response = ":thinking_face:, was there a date in there?"
 
