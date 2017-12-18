@@ -56,7 +56,7 @@ def handle_add_new_user(user_name, birth_date, timezone):
     countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
     status = db.create_birthday(user_name, birth_date.datetime, timezone)
-    
+
     if status:
         response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
                    f"hear again from me in *{countdown}* days! :wink:"
