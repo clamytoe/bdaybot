@@ -231,8 +231,15 @@ def process_birth_date(birth_date, channel, user_name, timezone):
 
         if current_birth_date:
             response = handle_user_exists(user_name, birth_date, timezone, current_birth_date)
+            existing_reminders = db.retrieve_user_reminders(user_name)
+            for r in existing_reminders:
+                db.delete_reminder(r[0])
+            # TODO: birth_date needs to be adjusted here for timezones, before the reminder creation
+            db.create_reminder(user_name, birth_date, channel)
         else:
             response = handle_add_new_user(user_name, birth_date, timezone)
+            # TODO: birth_date needs to be adjusted here for timezones, before the reminder creation
+            db.create_reminder(user_name, birth_date, channel)
     else:
         response = ":thinking_face:, was there a date in there?"
 
@@ -264,15 +271,19 @@ def reminders_check():
     if not reminders:
         return
     for r_id in reminders:
-        r_user, r_date = db.retrieve_reminder_date(r_id)
+        r_user, r_date, r_channel = db.retrieve_reminder_data(r_id)
+        if not r_user:
+            continue
         r_date = arrow.get(r_date)
-        if r_date.day == arrow.utcnow().day:
-            # TODO: here we should call the function that greets the "r_user"
-            pass
+        now = arrow.now().datetime
+        if r_date.day == now.day and r_date.month == now.month:
+            # generate greeting and post it
+            greeting = pick_random_message()
+            post_message(f'@{r_user}, {greeting}', r_channel)
             # then we delete the expired reminder
-            # db.delete_reminder(r_id)
+            db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
-            # db.create_reminder(r_user, r_date.shift(years=1))
+            db.create_reminder(r_user, r_date.shift(years=1), r_channel)
 
 
 def run_bot():
