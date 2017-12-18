@@ -1,13 +1,12 @@
-from random import choice
-import datetime
-import time
-from dateutil.parser import parse
-from dateutil import tz
 from functools import lru_cache
+from random import choice
+from time import sleep
 
 import arrow
-from slackclient import SlackClient
 from apscheduler.schedulers.background import BackgroundScheduler
+from dateutil.parser import parse
+from dateutil import tz
+from slackclient import SlackClient
 
 import bd_db as db
 from config import BOT_ID, SLACK_BOT_TOKEN
@@ -325,7 +324,7 @@ def run_bot():
                     days = 'day' if countdown <= 1 else 'days'
                     response = f"You have *{countdown}* {days} left to your birthday!"
                     post_message(response, channel)
-            time.sleep(READ_DELAY)
+            sleep(READ_DELAY)
     else:
         print('Connection failed, invalid Slack TOKEN or bot ID?')
 
