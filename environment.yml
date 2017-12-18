@@ -8,5 +8,4 @@ dependencies:
 - python-dateutil=2.6.1
 - sqlalchemy=1.1.13
 - pip:
-  - apscheduler==3.4.0
   - slackclient==1.1.0
