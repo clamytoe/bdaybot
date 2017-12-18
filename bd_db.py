@@ -154,7 +154,7 @@ def retrieve_user_reminders(user):
         res = session.query(Reminder).filter(Reminder.username == user).all()
         if not res:
             return None
-        return [(reminder.id, reminder.birthday) for reminder in res]
+        return [(reminder.id, reminder.birthday, reminder.timezone) for reminder in res]
 
 
 def create_reminder(user, birthday):
