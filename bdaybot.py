@@ -264,9 +264,9 @@ def reminders_check():
     if not reminders:
         return
     for r_id in reminders:
-        r_user, r_date, r_tz = db.retrieve_reminder_date(r_id)
-        r_date = arrow.get(r_date).to(tz)
-        if r_date.day == arrow.utcnow().to(r_tz).day:
+        r_user, r_date = db.retrieve_reminder_date(r_id)
+        r_date = arrow.get(r_date)
+        if r_date.day == arrow.utcnow().day:
             # TODO: here we should call the function that greets the "r_user"
             pass
             # then we delete the expired reminder
