@@ -1,10 +1,11 @@
-from random import choice
-import time
-from dateutil.parser import parse
-from dateutil import tz
 from functools import lru_cache
+from random import choice
+from time import sleep
 
 import arrow
+from apscheduler.schedulers.background import BackgroundScheduler
+from dateutil.parser import parse
+from dateutil import tz
 from slackclient import SlackClient
 
 import bd_db as db
@@ -15,24 +16,6 @@ SLACK_CLIENT = SlackClient(SLACK_BOT_TOKEN)
 
 AT_BOT = f'<@{BOT_ID}>'
 READ_DELAY = 1
-
-
-def add_date(user_name, birth_date, timezone):
-    """
-    Add a user to the database if it doesn't exist. Change their birthday if a new date is given.
-
-    :param user_name: String - User name
-    :param birth_date: Arrow datetime - User's birthday
-    :param timezone: String - Timezone for the user
-    :return: Bool - True or False
-    """
-    current_bday = lookup_birthday(user_name)[0]
-    if current_bday:
-        update_status = db.modify_birthday(user_name, birth_date.datetime, timezone)
-        return update_status if update_status else False
-    else:
-        status = db.create_birthday(user_name, birth_date.datetime, timezone)
-    return status
 
 
 def days_left_to_birthday(birth_date, timezone):
@@ -57,22 +40,36 @@ def days_left_to_birthday(birth_date, timezone):
 
 
 def calculate_age(birth_date, timezone):
-    # TODO: Returns an age based on today's date and the birth date given
-    pass
+    """
+    Returns the age of the user given their birthday.
+
+    :param birth_date: Arrow datetime - user's birth date
+    :param timezone: String - user's local timezone
+    :return: Integer - the age of the user
+    """
+    today = arrow.utcnow().to(timezone)
+    age = today.year - birth_date.year
+
+    if birth_date.month == today.month:
+        if today.day < birth_date.day:
+            age -= 1
+
+    return age
 
 
-def handle_add_new_user(user_name, birth_date, timezone, countdown):
+def handle_add_new_user(user_name, birth_date, timezone):
     """
     Handles the event where the user does not exists in the database.
 
     :param user_name: String - the username of the user
     :param birth_date: Arrow datetime - user's birth date
     :param timezone: String - user's local timezone
-    :param countdown: Integer - days left to the user's birthday
     :return: String - response message to the user
     """
+    countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
-    status = add_date(user_name, birth_date, timezone)
+    status = db.create_birthday(user_name, birth_date.datetime, timezone)
+
     if status:
         response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
                    f"hear again from me in *{countdown}* days! :wink:"
@@ -81,25 +78,7 @@ def handle_add_new_user(user_name, birth_date, timezone, countdown):
     return response
 
 
-def handle_birthday_event(user_name, birth_date, timezone):
-    """
-    Handles the event where the given birth date is the same as the current date.
-
-    :param user_name: String - the username of the user
-    :param birth_date: Arrow datetime - user's birth date
-    :param timezone: String - user's local timezone
-    :return: String - response message to the user
-    """
-    status = add_date(user_name, birth_date, timezone)
-    greeting = pick_random_message()
-    if status:
-        response = f":gift: Hey!, today is your BIRTHDAY!! :cake:\n{greeting}"
-    else:
-        response = f"I wasn't able to save your birth date, but Happy Birthday anyways!!"
-    return response
-
-
-def handle_user_exists(user_name, birth_date, timezone, current_birth_date, countdown):
+def handle_user_exists(user_name, birth_date, timezone, current_birth_date):
     """
     Handles the event where the user already exists in the database.
 
@@ -107,17 +86,17 @@ def handle_user_exists(user_name, birth_date, timezone, current_birth_date, coun
     :param birth_date: Arrow datetime - user's birth date
     :param timezone: String - user's local timezone
     :param current_birth_date: Datetime - the birth date that is currently in the database
-    :param countdown: Integer - days left to the user's birthday
     :return: String - response message to the user
     """
-    pp_current = pp_date(current_birth_date)
+    countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
+    pp_current = pp_date(current_birth_date)
 
     if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
         response = f":confused: I already have your birthday set. You still have *{countdown}* days more, " \
                    f"so please be patient! :ok_hand:"
     else:
-        status = add_date(user_name, birth_date, timezone)
+        status = db.modify_birthday(user_name, birth_date.datetime, timezone)
         if status:
             response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
         else:
@@ -135,7 +114,7 @@ def lookup_birthday(user_name):
     Retrieves the user's birthday and timezone from the database
 
     :param user_name: String - User name
-    :return: Tuple - (birth_date, timezone) or None
+    :return: Tuple - (birth_date, timezone) or (None, None)
     """
     birth_date, timezone = db.retrieve_user_data(user_name)
     return birth_date, timezone if birth_date and timezone else None, None
@@ -248,15 +227,12 @@ def process_birth_date(birth_date, channel, user_name, timezone):
     :return: None - message is posted to the channel
     """
     if birth_date:
-        countdown = days_left_to_birthday(birth_date, timezone)
         current_birth_date = lookup_birthday(user_name)[0]
 
-        if countdown == 0:
-            response = handle_birthday_event(user_name, birth_date, timezone)
-        elif current_birth_date:
-            response = handle_user_exists(user_name, birth_date, timezone, current_birth_date, countdown)
+        if current_birth_date:
+            response = handle_user_exists(user_name, birth_date, timezone, current_birth_date)
         else:
-            response = handle_add_new_user(user_name, birth_date, timezone, countdown)
+            response = handle_add_new_user(user_name, birth_date, timezone)
     else:
         response = ":thinking_face:, was there a date in there?"
 
@@ -277,6 +253,28 @@ def display_help(channel):
     post_message(response, channel)
 
 
+def reminders_check():
+    """
+    Retrieves all reminders and compares their date with the current one.
+    If a birthday is found, it sends a birthday greeting, deletes the reminder and schedules the one for the next year.
+
+    :return: None
+    """
+    reminders = db.get_all_reminder_ids()
+    if not reminders:
+        return
+    for r_id in reminders:
+        r_user, r_date, r_tz = db.retrieve_reminder_date(r_id)
+        r_date = arrow.get(r_date).to(tz)
+        if r_date.day == arrow.utcnow().to(r_tz).day:
+            # TODO: here we should call the function that greets the "r_user"
+            pass
+            # then we delete the expired reminder
+            # db.delete_reminder(r_id)
+            # and after that, we set up next year's reminder
+            # db.create_reminder(r_user, r_date.shift(years=1))
+
+
 def run_bot():
     """
     Starts the bot.
@@ -285,6 +283,11 @@ def run_bot():
     """
     if SLACK_CLIENT.rtm_connect():
         print('Bot connected and running!')
+
+        reminders_scheduler = BackgroundScheduler()
+        reminders_scheduler.add_job(reminders_check, 'cron', hour='*', minute=0)
+        reminders_scheduler.start()
+
         while True:
             (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
             if message and channel:
@@ -300,7 +303,7 @@ def run_bot():
                     days = 'day' if countdown <= 1 else 'days'
                     response = f"You have *{countdown}* {days} left to your birthday!"
                     post_message(response, channel)
-            time.sleep(READ_DELAY)
+            sleep(READ_DELAY)
     else:
         print('Connection failed, invalid Slack TOKEN or bot ID?')
 
