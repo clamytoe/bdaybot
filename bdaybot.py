@@ -18,6 +18,13 @@ AT_BOT = f'<@{BOT_ID}>'
 READ_DELAY = 1
 
 
+def add_reminder(user_name, birth_date, timezone, channel):
+    bday = calculate_next_birth_date(birth_date, timezone)
+    status = db.create_reminder(user_name, bday.datetime, channel)
+
+    return status
+
+
 def days_left_to_birthday(birth_date, timezone):
     """
     Determines how many days are left until the user's next birthday.
@@ -59,14 +66,22 @@ def calculate_age(birth_date, timezone):
 
 def calculate_next_birth_date(birth_date, timezone):
     """
-    Calculates next year's birthday from the given birthday and timezone of the user.
+    Calculates the next birthday from the given birthday and timezone of the user.
 
     :param birth_date: Arrow datetime object - the user's birthday
     :param timezone: String - the user's timezone
     :return: Arrow datetime object with next year's birth date
     """
     today = calculate_today(timezone)
-    return birth_date.replace(year=today.year)
+    this_year = today.year
+
+    bday = birth_date.replace(year=this_year)
+
+    if today > bday:
+        this_year += 1
+        bday = birth_date.replace(year=this_year)
+
+    return bday
 
 
 def calculate_today(timezone):
@@ -79,20 +94,22 @@ def calculate_today(timezone):
     return arrow.utcnow().to(timezone).floor('hour')  # discards the time
 
 
-def handle_add_new_user(user_name, birth_date, timezone):
+def handle_add_new_user(user_name, birth_date, timezone, channel):
     """
     Handles the event where the user does not exists in the database.
 
     :param user_name: String - the username of the user
     :param birth_date: Arrow datetime - user's birth date
     :param timezone: String - user's local timezone
+    :param channel: String - the channel were the birthday was posted
     :return: String - response message to the user
     """
     countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
     status = db.create_birthday(user_name, birth_date.datetime, timezone)
+    r_status = add_reminder(user_name, birth_date, timezone, channel)
 
-    if status:
+    if status and r_status:
         response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
                    f"hear again from me in *{countdown}* days! :wink:"
     else:
@@ -100,13 +117,14 @@ def handle_add_new_user(user_name, birth_date, timezone):
     return response
 
 
-def handle_user_exists(user_name, birth_date, timezone, current_birth_date):
+def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_date):
     """
     Handles the event where the user already exists in the database.
 
     :param user_name: String - the username of the user
     :param birth_date: Arrow datetime - user's birth date
     :param timezone: String - user's local timezone
+    :param channel: String - the channel were the birthday was posted
     :param current_birth_date: Datetime - the birth date that is currently in the database
     :return: String - response message to the user
     """
@@ -119,7 +137,8 @@ def handle_user_exists(user_name, birth_date, timezone, current_birth_date):
                    f"so please be patient! :ok_hand:"
     else:
         status = db.modify_birthday(user_name, birth_date.datetime, timezone)
-        if status:
+        r_status = update_reminders(user_name, birth_date, timezone, channel)
+        if status and r_status:
             response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
         else:
             response = f"Sorry but I couldn't change your birthday from *{pp_current}* to *{pp_bday}*."
@@ -221,6 +240,7 @@ def parse_message(message, timezone):
     try:
         b_day = parse(message, fuzzy=True)
         birthday = arrow.get(b_day, tz.gettz(timezone))
+        print(f'BDAY: {birthday}')
         return birthday
     except (ValueError, TypeError):
         return None
@@ -238,31 +258,22 @@ def pp_date(date):
     return date.format('MMMM D, YYYY')
 
 
-def process_birth_date(birth_date, channel, user_name, timezone):
+def process_birth_date(birth_date, user_name, timezone, channel, current_birth_date):
     """
     Processes the given date and returns the proper response to the channel.
 
     :param birth_date: datetime object
-    :param channel: String - the channel were the birthday was posted
     :param user_name: String - the user name of the person entering/changing their birthday
     :param timezone: String - the user's timezone
+    :param channel: String - the channel were the birthday was posted
+    :param current_birth_date: Arrow datetime object - existing birthday in the database
     :return: None - message is posted to the channel
     """
     if birth_date:
-        current_birth_date = lookup_birthday(user_name)[0]
-
         if current_birth_date:
-            response = handle_user_exists(user_name, birth_date, timezone, current_birth_date)
-            existing_reminders = db.retrieve_user_reminders(user_name)
-
-            for r in existing_reminders:
-                db.delete_reminder(r[0])
-
-            next_birth_date = calculate_next_birth_date(birth_date, timezone)
-            db.create_reminder(user_name, next_birth_date, channel)
+            response = handle_user_exists(user_name, birth_date, timezone, channel, current_birth_date)
         else:
-            response = handle_add_new_user(user_name, birth_date, timezone)
-            db.create_reminder(user_name, birth_date, channel)
+            response = handle_add_new_user(user_name, birth_date, timezone, channel)
     else:
         response = ":thinking_face:, was there a date in there?"
 
@@ -309,6 +320,18 @@ def reminders_check():
             db.create_reminder(r_user, r_date.shift(years=1), r_channel)
 
 
+def update_reminders(user_name, birth_date, timezone, channel):
+    existing_reminders = db.retrieve_user_reminders(user_name)
+
+    if existing_reminders:
+        for r in existing_reminders:
+            db.delete_reminder(r[0])
+
+    next_birth_date = calculate_next_birth_date(birth_date, timezone)
+    r_status = db.create_reminder(user_name, next_birth_date.datetime, channel)
+    return r_status
+
+
 def run_bot():
     """
     Starts the bot.
@@ -330,7 +353,7 @@ def run_bot():
                 if "help" in message.lower():
                     display_help(channel)
                 elif "birthday" in message and birth_date:
-                    process_birth_date(birth_date, channel, user_name, timezone)
+                    process_birth_date(birth_date, user_name, timezone, channel, current_birth_date)
                 elif "birthday" in message and current_birth_date:
                     current = arrow.get(current_birth_date)
                     countdown = days_left_to_birthday(current, timezone)

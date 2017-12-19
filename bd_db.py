@@ -169,7 +169,7 @@ def create_reminder(user, birthday, channel):
         with session_scope() as session:
             session.add(new_reminder)
         return True
-    except:
+    except TypeError:
         return False
 
 
