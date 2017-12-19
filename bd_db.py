@@ -17,7 +17,7 @@ class Birthday(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
-    birth_date = Column(Date)
+    birth_date = Column(DateTime)
     timezone = Column(String)
     reminders = relationship("Reminder")
 

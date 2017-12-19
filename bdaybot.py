@@ -19,6 +19,15 @@ READ_DELAY = 1
 
 
 def add_reminder(user_name, birth_date, timezone, channel):
+    """
+    Add's a new entry into the reminders database.
+
+    :param user_name: String - the username of the user
+    :param birth_date: Arrow datetime - user's birth date
+    :param timezone: String - user's local timezone
+    :param channel: String - the channel were the birthday was posted
+    :return: Boolean
+    """
     bday = calculate_next_birth_date(birth_date, timezone)
     status = db.create_reminder(user_name, bday.datetime, channel)
 
@@ -240,7 +249,6 @@ def parse_message(message, timezone):
     try:
         b_day = parse(message, fuzzy=True)
         birthday = arrow.get(b_day, tz.gettz(timezone))
-        print(f'BDAY: {birthday}')
         return birthday
     except (ValueError, TypeError):
         return None
@@ -321,6 +329,15 @@ def reminders_check():
 
 
 def update_reminders(user_name, birth_date, timezone, channel):
+    """
+    Updates the reminders database.
+
+    :param user_name: String - the user name of the person entering/changing their birthday
+    :param birth_date: datetime object
+    :param timezone: String - the user's timezone
+    :param channel: String - the channel were the birthday was posted
+    :return: Boolean
+    """
     existing_reminders = db.retrieve_user_reminders(user_name)
 
     if existing_reminders:
