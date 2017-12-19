@@ -26,8 +26,8 @@ def days_left_to_birthday(birth_date, timezone):
     :param timezone: String - the timezone of the user
     :return: Integer - the number of days left until the next birthday
     """
-    today = arrow.utcnow().to(timezone).floor('hour')  # discards the time
-    next_birth_date = birth_date.replace(year=today.year)
+    today = calculate_today(timezone)
+    next_birth_date = calculate_next_birth_date(birth_date, timezone)
     str_today = str(today).split('T')[0]
     str_next_birth_date = str(next_birth_date).split('T')[0]
 
@@ -47,7 +47,7 @@ def calculate_age(birth_date, timezone):
     :param timezone: String - user's local timezone
     :return: Integer - the age of the user
     """
-    today = arrow.utcnow().to(timezone)
+    today = calculate_today(timezone)
     age = today.year - birth_date.year
 
     if birth_date.month == today.month:
@@ -55,6 +55,28 @@ def calculate_age(birth_date, timezone):
             age -= 1
 
     return age
+
+
+def calculate_next_birth_date(birth_date, timezone):
+    """
+    Calculates next year's birthday from the given birthday and timezone of the user.
+
+    :param birth_date: Arrow datetime object - the user's birthday
+    :param timezone: String - the user's timezone
+    :return: Arrow datetime object with next year's birth date
+    """
+    today = calculate_today(timezone)
+    return birth_date.replace(year=today.year)
+
+
+def calculate_today(timezone):
+    """
+    Calculates today's date, adjusts it's timezone and converts it into an arrow datetime object.
+
+    :param timezone: String - the timezone of the user.
+    :return: Arrow datetime object
+    """
+    return arrow.utcnow().to(timezone).floor('hour')  # discards the time
 
 
 def handle_add_new_user(user_name, birth_date, timezone):
@@ -194,7 +216,7 @@ def parse_message(message, timezone):
 
     :param message: String - the message from the user
     :param timezone: String - the user's timezone
-    :return: datetime.datetime object - the date or None
+    :return: Arrow datetime object - the birth date parsed or None
     """
     try:
         b_day = parse(message, fuzzy=True)
@@ -232,13 +254,14 @@ def process_birth_date(birth_date, channel, user_name, timezone):
         if current_birth_date:
             response = handle_user_exists(user_name, birth_date, timezone, current_birth_date)
             existing_reminders = db.retrieve_user_reminders(user_name)
+
             for r in existing_reminders:
                 db.delete_reminder(r[0])
-            # TODO: birth_date needs to be adjusted here for timezones, before the reminder creation
-            db.create_reminder(user_name, birth_date, channel)
+
+            next_birth_date = calculate_next_birth_date(birth_date, timezone)
+            db.create_reminder(user_name, next_birth_date, channel)
         else:
             response = handle_add_new_user(user_name, birth_date, timezone)
-            # TODO: birth_date needs to be adjusted here for timezones, before the reminder creation
             db.create_reminder(user_name, birth_date, channel)
     else:
         response = ":thinking_face:, was there a date in there?"
