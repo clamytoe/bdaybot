@@ -2,11 +2,12 @@ from functools import lru_cache
 from random import choice
 from time import sleep
 
-import arrow
 from apscheduler.schedulers.background import BackgroundScheduler
+import arrow
 from dateutil.parser import parse
 from dateutil import tz
 from slackclient import SlackClient
+
 
 import bd_db as db
 from config import BOT_ID, SLACK_BOT_TOKEN
@@ -34,25 +35,18 @@ def add_reminder(user_name, birth_date, timezone, channel):
     return status
 
 
-def days_left_to_birthday(birth_date, timezone):
+def adjust_date_with_timezone(date, timezone):
     """
-    Determines how many days are left until the user's next birthday.
+    Returns the provided date + timezone adjusted to the local timezone of this script, set to 9am.
 
-    :param birth_date: Arrow datetime - the user's birthday
-    :param timezone: String - the timezone of the user
-    :return: Integer - the number of days left until the next birthday
+    :param date: Arrow datetime / Basic datetime object - user's birthdate
+    :param timezone: String - user's local timezone
+    :return: Datetime - the adjusted datetime object
     """
-    today = calculate_today(timezone)
-    next_birth_date = calculate_next_birth_date(birth_date, timezone)
-    str_today = str(today).split('T')[0]
-    str_next_birth_date = str(next_birth_date).split('T')[0]
-
-    if str_next_birth_date == str_today:
-        return 0
-    elif next_birth_date < today:
-        next_birth_date = next_birth_date.shift(years=1)
-
-    return (next_birth_date - today).days
+    date = arrow.get(date).replace(hour=9, minute=0, second=0)
+    date_with_user_timezone = date.to(timezone)
+    adjusted_date = date_with_user_timezone.to('local')
+    return adjusted_date.datetime
 
 
 def calculate_age(birth_date, timezone):
@@ -103,6 +97,41 @@ def calculate_today(timezone):
     return arrow.utcnow().to(timezone).floor('hour')  # discards the time
 
 
+def days_left_to_birthday(birth_date, timezone):
+    """
+    Determines how many days are left until the user's next birthday.
+
+    :param birth_date: Arrow datetime - the user's birthday
+    :param timezone: String - the timezone of the user
+    :return: Integer - the number of days left until the next birthday
+    """
+    today = calculate_today(timezone)
+    next_birth_date = calculate_next_birth_date(birth_date, timezone)
+    str_today = str(today).split('T')[0]
+    str_next_birth_date = str(next_birth_date).split('T')[0]
+
+    if str_next_birth_date == str_today:
+        return 0
+    elif next_birth_date < today:
+        next_birth_date = next_birth_date.shift(years=1)
+
+    return (next_birth_date - today).days
+
+
+def display_help(channel):
+    """
+    Displays a help message with the list of admitted commands
+
+    :param channel: String - The channel where the response should be posted
+    :return: None
+    """
+    response = "Tag me and say 'help' to display this message again.\n" \
+               "Tag me and say 'birthday' <your-birth-date-here> (sans the '<' and '>') for me to register" \
+               " your birthday, I will take your timezone into account!.\n" \
+               "Tag me and say 'birthday' for me to tell you when your birthday is coming."
+    post_message(response, channel)
+
+
 def handle_add_new_user(user_name, birth_date, timezone, channel):
     """
     Handles the event where the user does not exists in the database.
@@ -116,8 +145,8 @@ def handle_add_new_user(user_name, birth_date, timezone, channel):
     countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
     status = db.create_birthday(user_name, birth_date.datetime, timezone)
-    # TODO: reminder doesnt take timezone as a parameter, date should be adjusted with local timezone
-    r_status = add_reminder(user_name, birth_date, timezone, channel)
+    adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
+    r_status = add_reminder(user_name, adjusted_birthday, timezone, channel)
 
     if status and r_status:
         response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
@@ -147,8 +176,8 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
                    f"so please be patient! :ok_hand:"
     else:
         status = db.modify_birthday(user_name, birth_date.datetime, timezone)
-        # TODO: reminder doesnt take timezone as a parameter, date should be adjusted with local timezone
-        r_status = update_reminders(user_name, birth_date, timezone, channel)
+        adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
+        r_status = update_reminders(user_name, adjusted_birthday, channel)
         if status and r_status:
             response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
         else:
@@ -283,20 +312,6 @@ def process_birth_date(birth_date, user_name, timezone, channel, current_birth_d
         response = ":thinking_face:, was there a date in there?"
 
     # post the message
-    post_message(response, channel)
-
-
-def display_help(channel):
-    """
-    Displays a help message with the list of admitted commands
-
-    :param channel: String - The channel where the response should be posted
-    :return: None
-    """
-    response = "Tag me and say 'help' to display this message again.\n" \
-               "Tag me and say 'birthday' <your-birth-date-here> (sans the '<' and '>') for me to register" \
-               " your birthday, I will take your timezone into account!.\n" \
-               "Tag me and say 'birthday' for me to tell you when your birthday is coming."
     post_message(response, channel)
 
 
