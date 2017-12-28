@@ -43,8 +43,8 @@ def adjust_date_with_timezone(date, timezone):
     :param timezone: String - user's local timezone
     :return: Datetime - the adjusted datetime object
     """
-    date = arrow.get(date).replace(hour=9, minute=0, second=0)
-    date_with_user_timezone = date.to(timezone)
+    date = arrow.get(date)
+    date_with_user_timezone = date.to(timezone).replace(hour=9, minute=0, second=0)
     adjusted_date = date_with_user_timezone.to('local')
     return adjusted_date.datetime
 
