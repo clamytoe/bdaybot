@@ -116,6 +116,7 @@ def handle_add_new_user(user_name, birth_date, timezone, channel):
     countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
     status = db.create_birthday(user_name, birth_date.datetime, timezone)
+    # TODO: reminder doesnt take timezone as a parameter, date should be adjusted with local timezone
     r_status = add_reminder(user_name, birth_date, timezone, channel)
 
     if status and r_status:
@@ -146,6 +147,7 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
                    f"so please be patient! :ok_hand:"
     else:
         status = db.modify_birthday(user_name, birth_date.datetime, timezone)
+        # TODO: reminder doesnt take timezone as a parameter, date should be adjusted with local timezone
         r_status = update_reminders(user_name, birth_date, timezone, channel)
         if status and r_status:
             response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
@@ -293,7 +295,8 @@ def display_help(channel):
     """
     response = "Tag me and say 'help' to display this message again.\n" \
                "Tag me and say 'birthday' <your-birth-date-here> (sans the '<' and '>') for me to register" \
-               " your birthday, I will take your timezone into account!."
+               " your birthday, I will take your timezone into account!.\n" \
+               "Tag me and say 'birthday' for me to tell you when your birthday is coming."
     post_message(response, channel)
 
 
