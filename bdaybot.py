@@ -154,11 +154,6 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
     return response
 
 
-def check_for_upcoming_birth_dates():
-    # TODO: Hourly check for any upcoming birth dates changes countdown as the date gets closer
-    pass
-
-
 def lookup_birthday(user_name):
     """
     Retrieves the user's birthday and timezone from the database
