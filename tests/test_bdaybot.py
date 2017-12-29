@@ -34,11 +34,16 @@ def test_calculate_next_birth_date():
 
 def test_calculate_age():
     today_year = calculate_today(TZ).year
-    age = calculate_age(ABD, TZ)
+    age = calculate_age(ABDTZ, TZ)
     assert isinstance(age, int)
     assert age == today_year - ABDTZ.year
+
 
 def test_adjust_date_with_timezone():
     adjusted_date = adjust_date_with_timezone(ABD, TZ)
     assert isinstance(adjusted_date, datetime.datetime)
     assert str(adjusted_date) == '1972-12-05 15:00:00+00:00'
+
+def test_days_left_to_birthday():
+    days = days_left_to_birthday(ABDTZ, TZ)
+    assert isinstance(days, int)
