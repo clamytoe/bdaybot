@@ -330,7 +330,7 @@ def reminders_check():
             continue
         r_date = arrow.get(r_date).to('local')
         now = arrow.now().datetime
-        if r_date.day == now.day and r_date.month == now.month:
+        if r_date.strftime('%m/%d/%y %H') == now.strftime('%m/%d/%y %H'):
             # generate greeting and post it
             greeting = pick_random_message()
             post_message(f'@{r_user}, {greeting}', r_channel)
