@@ -84,7 +84,7 @@ def calculate_next_birth_date(birth_date, timezone):
         this_year += 1
         bday = birth_date.replace(year=this_year)
 
-    return bday
+    return bday.to(timezone)
 
 
 def calculate_today(timezone):
