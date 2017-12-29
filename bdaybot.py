@@ -149,8 +149,7 @@ def handle_add_new_user(user_name, birth_date, timezone, channel):
     r_status = add_reminder(user_name, adjusted_birthday, timezone, channel)
 
     if status and r_status:
-        response = f"Thanks, I've saved *{pp_bday}* as your birthday. You will " \
-                   f"hear again from me in *{countdown}* days! :wink:"
+        response = f"Thanks, I've saved *{pp_bday}* as your birthday. :wink:"
     else:
         response = f"Sorry, but for some unknown reason, I wasn't able to add *{pp_bday}* as your birthday..."
     return response
@@ -338,7 +337,7 @@ def reminders_check():
             # then we delete the expired reminder
             db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
-            db.create_reminder(r_user, r_date.shift(years=1), r_channel)
+            db.create_reminder(r_user, r_date.shift(years=1).datetime, r_channel)
 
 
 def update_reminders(user_name, birth_date, timezone, channel):
