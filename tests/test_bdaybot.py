@@ -18,6 +18,15 @@ def test_globals():
     assert str(ABDTZ.datetime) == '1972-12-05 18:00:00-06:00'
 
 
+def test_calculate_today():
+    arrow_today = arrow.now(TZ)
+    today = calculate_today(TZ)
+    assert today.year == arrow_today.year
+    assert today.month == arrow_today.month
+    assert today.day == arrow_today.day
+
+
 def test_calculate_next_birth_date():
     date = calculate_next_birth_date(ABD, TZ)
     assert str(date.datetime) == '2018-12-05 18:00:00-06:00'
+
