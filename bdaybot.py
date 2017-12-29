@@ -39,7 +39,7 @@ def adjust_date_with_timezone(date, timezone):
     """
     Returns the provided date + timezone adjusted to the local timezone of this script, set to 9am.
 
-    :param date: Arrow datetime / Basic datetime object - user's birthdate
+    :param date: Datetime / Basic datetime object - user's birthdate
     :param timezone: String - user's local timezone
     :return: Datetime - the adjusted datetime object in UTC tz
     """
