@@ -142,7 +142,6 @@ def handle_add_new_user(user_name, birth_date, timezone, channel):
     :param channel: String - the channel were the birthday was posted
     :return: String - response message to the user
     """
-    countdown = days_left_to_birthday(birth_date, timezone)
     pp_bday = pp_date(birth_date)
     status = db.create_birthday(user_name, birth_date.datetime, timezone)
     adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
