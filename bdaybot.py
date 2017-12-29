@@ -41,12 +41,12 @@ def adjust_date_with_timezone(date, timezone):
 
     :param date: Arrow datetime / Basic datetime object - user's birthdate
     :param timezone: String - user's local timezone
-    :return: Datetime - the adjusted datetime object
+    :return: Datetime - the adjusted datetime object in UTC tz
     """
     date = arrow.get(date)
     date_with_user_timezone = date.to(timezone).replace(hour=9, minute=0, second=0)
     adjusted_date = date_with_user_timezone.to('local')
-    return adjusted_date.datetime
+    return adjusted_date.to('utc').datetime
 
 
 def calculate_age(birth_date, timezone):
@@ -329,7 +329,7 @@ def reminders_check():
         r_user, r_date, r_channel = db.retrieve_reminder_data(r_id)
         if not r_user:
             continue
-        r_date = arrow.get(r_date)
+        r_date = arrow.get(r_date).to('local')
         now = arrow.now().datetime
         if r_date.day == now.day and r_date.month == now.month:
             # generate greeting and post it
