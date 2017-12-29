@@ -30,7 +30,7 @@ def add_reminder(user_name, birth_date, timezone, channel):
     :return: Boolean
     """
     bday = calculate_next_birth_date(birth_date, timezone)
-    status = db.create_reminder(user_name, bday.datetime, channel)
+    status = db.create_reminder(user_name, bday, channel)
 
     return status
 
@@ -177,7 +177,7 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
     else:
         status = db.modify_birthday(user_name, birth_date.datetime, timezone)
         adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
-        r_status = update_reminders(user_name, adjusted_birthday, channel)
+        r_status = update_reminders(user_name, adjusted_birthday, timezone, channel)
         if status and r_status:
             response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
         else:
@@ -358,7 +358,7 @@ def update_reminders(user_name, birth_date, timezone, channel):
             db.delete_reminder(r[0])
 
     next_birth_date = calculate_next_birth_date(birth_date, timezone)
-    r_status = db.create_reminder(user_name, next_birth_date.datetime, channel)
+    r_status = db.create_reminder(user_name, next_birth_date, channel)
     return r_status
 
 
