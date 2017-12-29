@@ -7,8 +7,10 @@ from bdaybot import *
 
 BD = parse('12/06/1972')
 ABD = arrow.get(BD)
-TZ = 'US/Central'
+TZ = 'America/Chicago'
 ABDTZ = ABD.to(TZ)
+USER = 'test_dummy'
+
 
 def test_globals():
     assert isinstance(SLACK_CLIENT, SlackClient)
@@ -47,3 +49,15 @@ def test_adjust_date_with_timezone():
 def test_days_left_to_birthday():
     days = days_left_to_birthday(ABDTZ, TZ)
     assert isinstance(days, int)
+
+
+def test_lookup_birthday():
+    status = db.create_birthday(USER, ABDTZ.datetime, TZ)
+    if status:
+        user_info = lookup_birthday(USER)
+        assert len(user_info) == 3
+        assert user_info[0] == USER
+        assert user_info[1] == TZ
+        db.delete_birthday(USER)
+    else:
+        pass
