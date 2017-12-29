@@ -30,7 +30,7 @@ def add_reminder(user_name, birth_date, timezone, channel):
     :return: Boolean
     """
     bday = calculate_next_birth_date(birth_date, timezone)
-    status = db.create_reminder(user_name, bday, channel)
+    status = db.create_reminder(user_name, bday.datetime, channel)
 
     return status
 
@@ -84,7 +84,7 @@ def calculate_next_birth_date(birth_date, timezone):
         this_year += 1
         bday = birth_date.replace(year=this_year)
 
-    return bday.to(timezone)
+    return arrow.get(bday).to(timezone)
 
 
 def calculate_today(timezone):
