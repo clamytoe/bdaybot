@@ -55,7 +55,7 @@ def test_lookup_birthday():
     status = db.create_birthday(USER, ABDTZ.datetime, TZ)
     if status:
         user_info = lookup_birthday(USER)
-        assert len(user_info) == 3
+        assert len(user_info) == 2
         assert user_info[0] == USER
         assert user_info[1] == TZ
         db.delete_birthday(USER)
