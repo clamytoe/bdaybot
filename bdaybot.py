@@ -207,7 +207,7 @@ def lookup_user(user_id):
     :return: String - Username of the user
     """
     user_info = SLACK_CLIENT.api_call('users.info', user=user_id)
-    user_name = f'{user_info["user"]["id"]}'
+    user_name = f'{user_info["user"]["name"]}'
     user_tz = f'{user_info["user"]["tz"]}'
     return user_name, user_tz
 
