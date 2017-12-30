@@ -191,7 +191,11 @@ def lookup_birthday(user_name):
     :return: Tuple - (birth_date, timezone) or (None, None)
     """
     birth_date, timezone = db.retrieve_user_data(user_name)
-    return birth_date, timezone if birth_date and timezone else None, None
+
+    if birth_date and timezone:
+        return birth_date, timezone
+    else:
+        return None, None
 
 
 @lru_cache(maxsize=128)
@@ -332,7 +336,7 @@ def reminders_check():
         if r_date.strftime('%m/%d/%y %H') == now.strftime('%m/%d/%y %H'):
             # generate greeting and post it
             greeting = pick_random_message()
-            post_message(f'@{r_user}, {greeting}', r_channel)
+            post_message(f'<@{r_user}>, {greeting}', r_channel)
             # then we delete the expired reminder
             db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
