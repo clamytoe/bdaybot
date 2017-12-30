@@ -263,7 +263,7 @@ def post_message(response, channel):
     :param channel: String - the channel were the response is to be posted to
     :return: None
     """
-    SLACK_CLIENT.api_call('chat.postMessage', channel=channel, text=response, as_user=True)
+    SLACK_CLIENT.api_call('chat.postMessage', channel=channel, text=response, as_user=True, link_names=1)
 
 
 def parse_message(message, timezone):
