@@ -46,18 +46,43 @@ def test_adjust_date_with_timezone():
     assert isinstance(adjusted_date, datetime.datetime)
     assert str(adjusted_date) == '1972-12-05 15:00:00+00:00'
 
+
 def test_days_left_to_birthday():
     days = days_left_to_birthday(ABDTZ, TZ)
     assert isinstance(days, int)
 
 
 def test_lookup_birthday():
-    status = db.create_birthday(USER, ABDTZ.datetime, TZ)
-    if status:
-        user_info = lookup_birthday(USER)
-        assert len(user_info) == 2
-        assert user_info[0] == USER
-        assert user_info[1] == TZ
-        db.delete_birthday(USER)
-    else:
-        pass
+    _ = db.create_birthday(USER, ABDTZ.datetime, TZ)
+    user_info = lookup_birthday(USER)
+    assert isinstance(user_info, tuple)
+    assert len(user_info) == 2
+    assert str(user_info[0]) == '1972-12-05 18:00:00'
+    assert user_info[1] == TZ
+    del_status = db.delete_birthday(USER)
+    assert del_status is True
+
+
+def test_lookup_birthday_failed():
+    user_info = lookup_birthday(USER)
+    assert isinstance(user_info, tuple)
+    assert len(user_info) == 2
+    assert user_info[0] is None
+    assert user_info[1] is None
+
+
+def test_parse_message():
+    message = '<@U8DER4W6N> birthday 12/6/72'
+    result = parse_message(message, TZ)
+    assert isinstance(result, arrow.Arrow)
+    assert result.year == 1972
+    assert result.month == 12
+    assert result.day == 6
+    failed = parse_message('<@U8DER4W6N> good morning bot!', TZ)
+    assert failed is None
+
+
+def test_parse_message_failed():
+    message = '<@U8DER4W6N> good morning bot!'
+    result = parse_message(message, TZ)
+    assert result is None
