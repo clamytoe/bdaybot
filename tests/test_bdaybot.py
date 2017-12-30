@@ -1,8 +1,4 @@
-import arrow
 import datetime
-
-from dateutil.parser import parse
-from dateutil.zoneinfo import tzfile
 from bdaybot import *
 
 BD = parse('12/06/1972')
