@@ -33,12 +33,11 @@ def test_api_call(slack_client, monkeypatch):
     users_list = slack_client.api_call('users.list')
     members = users_list.get('members')
     users = [user['name'] for user in members]
+    user, timezone = lookup_user('U865MULPQ')
 
     assert users_list.get('ok') is True
     assert isinstance(members, list)
     assert isinstance(members[0], dict)
     assert 'bdaybot' in users
-
-    user, timezone = lookup_user('U865MULPQ')
     assert user == 'dseptem'
     assert timezone == 'America/Los_Angeles'
