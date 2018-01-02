@@ -4,6 +4,7 @@
 The concept is simple. Tell the bot your birthday and when it comes around, get a nice little birthday message.
 
 ![Python version][python-version]
+[![Build Status][travis-image]][travis-url]
 [![GitHub issues][issues-image]][issues-url]
 [![GitHub forks][fork-image]][fork-url]
 [![GitHub Stars][stars-image]][stars-url]
@@ -34,6 +35,8 @@ source activate bdaybot
 ```
 
 [python-version]:https://img.shields.io/badge/python-3.6%2B-brightgreen.svg
+[travis-image]:https://travis-ci.org/clamytoe/pguide.svg?branch=master
+[travis-url]:https://travis-ci.org/clamytoe/pguide
 [issues-image]:https://img.shields.io/github/issues/clamytoe/bdaybot.svg
 [issues-url]:https://github.com/clamytoe/bdaybot/issues
 [fork-image]:https://img.shields.io/github/forks/clamytoe/bdaybot.svg
