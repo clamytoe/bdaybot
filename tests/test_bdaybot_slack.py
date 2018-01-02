@@ -3,11 +3,13 @@ import pytest
 from slackclient import SlackClient
 
 from config import BOT_ID, SLACK_BOT_TOKEN
+from bdaybot import lookup_user, SLACK_CLIENT
+from tests.slack_api_calls import api_users_info_dseptem, api_users_list
 
 
 @pytest.fixture
 def slack_client():
-    return SlackClient(SLACK_BOT_TOKEN)
+    return SLACK_CLIENT
 
 
 def test_environment_variables():
@@ -19,12 +21,24 @@ def test_slack_client(slack_client):
     assert isinstance(slack_client, SlackClient)
 
 
-def test_api_call(slack_client):
-    api_call = slack_client.api_call("users.list")
-    users_dict = api_call.get('members')
-    users = [user['name'] for user in users_dict]
+def test_api_call(slack_client, monkeypatch):
+    def mock_api_call(api_type, user=None):
+        if api_type == 'users.list':
+            return api_users_list
+        elif api_type == 'users.info':
+            return api_users_info_dseptem
+        else:
+            return None
+    monkeypatch.setattr(slack_client, 'api_call', mock_api_call)
+    users_list = slack_client.api_call('users.list')
+    members = users_list.get('members')
+    users = [user['name'] for user in members]
 
-    assert api_call.get('ok') is True
-    assert isinstance(users, list)
-    assert isinstance(users_dict[0], dict)
+    assert users_list.get('ok') is True
+    assert isinstance(members, list)
+    assert isinstance(members[0], dict)
     assert 'bdaybot' in users
+
+    user, timezone = lookup_user('U865MULPQ')
+    assert user == 'dseptem'
+    assert timezone == 'America/Los_Angeles'
