@@ -3,7 +3,7 @@ import datetime
 import arrow
 import pytest
 
-from bdaybot import calculate_today, parse, calculate_next_birth_date, calculate_age, parse_message,\
+from bdaybot import calculate_today, parse, calculate_next_birth_date, parse_message, \
     adjust_date_with_timezone, days_left_to_birthday
 
 BD = parse('12/06/1972')
@@ -49,13 +49,6 @@ def test_calculate_next_birth_date():
     date = calculate_next_birth_date(ABD, TZ)
     assert isinstance(date, arrow.Arrow)
     assert str(date.datetime) == '2018-12-05 18:00:00-06:00'
-
-
-def test_calculate_age():
-    today_year = calculate_today(TZ).year
-    age = calculate_age(ABDTZ, TZ)
-    assert isinstance(age, int)
-    assert age == today_year - ABDTZ.year
 
 
 def test_adjust_date_with_timezone():
