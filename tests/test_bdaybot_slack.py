@@ -27,5 +27,5 @@ def test_api_call(slack_client):
 
     assert api_call.get('ok') == True
     assert isinstance(users, list)
-    assert isinstance(users[0], dict)
+    assert isinstance(users_dict[0], dict)
     assert 'bdaybot' in users
