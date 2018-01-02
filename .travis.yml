@@ -1,0 +1,10 @@
+language: python
+cache:
+  - pip
+python:
+  - 3.6.3
+install:
+  - pip install -U setuptools
+  - pip install -r requirements.txt
+script:
+  - python -m pytest -v
