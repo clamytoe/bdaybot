@@ -49,25 +49,6 @@ def adjust_date_with_timezone(date, timezone):
     return adjusted_date.to('utc').datetime
 
 
-def calculate_age(birth_date, timezone):
-    # TODO: Seems unused, should be removed?
-    """
-    Returns the age of the user given their birthday.
-
-    :param birth_date: Arrow datetime - user's birth date
-    :param timezone: String - user's local timezone
-    :return: Integer - the age of the user
-    """
-    today = calculate_today(timezone)
-    age = today.year - birth_date.year
-
-    if birth_date.month == today.month:
-        if today.day < birth_date.day:
-            age -= 1
-
-    return age
-
-
 def calculate_next_birth_date(birth_date, timezone):
     # TODO: Can easily be replaced by Arrow's shift function: remove this and refactor?
     """
