@@ -50,6 +50,7 @@ def adjust_date_with_timezone(date, timezone):
 
 
 def calculate_age(birth_date, timezone):
+    # TODO: Seems unused, should be removed?
     """
     Returns the age of the user given their birthday.
 
@@ -68,6 +69,7 @@ def calculate_age(birth_date, timezone):
 
 
 def calculate_next_birth_date(birth_date, timezone):
+    # TODO: Can easily be replaced by Arrow's shift function: remove this and refactor?
     """
     Calculates the next birthday from the given birthday and timezone of the user.
 
@@ -88,6 +90,7 @@ def calculate_next_birth_date(birth_date, timezone):
 
 
 def calculate_today(timezone):
+    # TODO: Just a shortcut for an arrow function, testing is unneeded
     """
     Calculates today's date, adjusts it's timezone and converts it into an arrow datetime object.
 
