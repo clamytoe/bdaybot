@@ -3,7 +3,6 @@ import pytest
 from slackclient import SlackClient
 
 from config import BOT_ID, SLACK_BOT_TOKEN
-from bdaybot import SLACK_CLIENT
 
 
 @pytest.fixture
@@ -25,7 +24,7 @@ def test_api_call(slack_client):
     users_dict = api_call.get('members')
     users = [user['name'] for user in users_dict]
 
-    assert api_call.get('ok') == True
+    assert api_call.get('ok') is True
     assert isinstance(users, list)
     assert isinstance(users_dict[0], dict)
     assert 'bdaybot' in users
