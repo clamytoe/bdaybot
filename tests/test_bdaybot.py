@@ -28,12 +28,28 @@ def test_add_reminder_fail(monkeypatch):
     monkeypatch.setattr(db, 'create_reminder', mock_db_create_fail)
     with pytest.raises(TypeError):
         add_reminder(USER, 'not a datetime', TZ, 'general')
-        add_reminder(123, ABD, TZ, 'general')
-        add_reminder(None, ABD, TZ, 'general')
+    with pytest.raises(TypeError):
         add_reminder(USER, ABD, None, 'general')
-        add_reminder(USER, ABD, TZ, None)
     status = add_reminder(USER, ABD, TZ, 'general')
     assert status is False
+
+
+def test_adjust_date_with_timezone_ok():
+    adj_date = adjust_date_with_timezone(datetime.datetime(day=6, month=1, year=1987), 'America/Argentina/Buenos_Aires')
+    assert adj_date == datetime.datetime(1987, 1, 5, 12, 0, tzinfo=datetime.timezone.utc)
+    adj_date = adjust_date_with_timezone(datetime.datetime(day=25, month=4, year=1994), 'Africa/Nouakchott')
+    assert adj_date == datetime.datetime(1994, 4, 25, 9, 0, tzinfo=datetime.timezone.utc)
+    adj_date = adjust_date_with_timezone(datetime.datetime(day=11, month=7, year=1973), 'America/Los_Angeles')
+    assert adj_date == datetime.datetime(1973, 7, 10, 16, 0, tzinfo=datetime.timezone.utc)
+
+
+def test_adjust_date_with_timezone_fail():
+    with pytest.raises(arrow.parser.ParserError):
+        adjust_date_with_timezone(datetime.datetime(day=6, month=1, year=1987), 'Blah')
+    with pytest.raises(arrow.parser.ParserError):
+        adjust_date_with_timezone('6th january 1987', 'America/Argentina/Buenos_Aires')
+    with pytest.raises(TypeError):
+        adjust_date_with_timezone(None, None)
 
 # commented the rest to start again from the beginning
 #
