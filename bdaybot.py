@@ -102,18 +102,17 @@ def days_left_to_birthday(birth_date, timezone):
     return (next_birth_date - today).days
 
 
-def display_help(channel):
+def display_help():
     """
     Displays a help message with the list of admitted commands
 
-    :param channel: String - The channel where the response should be posted
-    :return: None
+    :return: String - help message
     """
     response = "Tag me and say 'help' to display this message again.\n" \
                "Tag me and say 'birthday' <your-birth-date-here> (sans the '<' and '>') for me to register" \
                " your birthday, I will take your timezone into account!.\n" \
                "Tag me and say 'birthday' for me to tell you when your birthday is coming."
-    post_message(response, channel)
+    return response
 
 
 def handle_add_new_user(user_name, birth_date, timezone, channel):
@@ -367,7 +366,7 @@ def run_bot():
                 birth_date = parse_message(message, timezone)
                 current_birth_date = lookup_birthday(user_name)[0]
                 if "help" in message.lower():
-                    display_help(channel)
+                    post_message(display_help(), channel)
                 elif "birthday" in message and birth_date:
                     process_birth_date(birth_date, user_name, timezone, channel, current_birth_date)
                 elif "birthday" in message and current_birth_date:
