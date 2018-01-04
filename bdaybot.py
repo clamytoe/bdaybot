@@ -373,7 +373,7 @@ def run_bot():
                     current = arrow.get(current_birth_date)
                     countdown = days_left_to_birthday(current, timezone)
                     days = 'day' if countdown <= 1 else 'days'
-                    response = f"You have *{countdown}* {days} left to your birthday!"
+                    response = f"You have *{countdown}* {days} left for your next birthday!"
                     post_message(response, channel)
             sleep(READ_DELAY)
     else:
