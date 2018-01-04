@@ -286,7 +286,7 @@ def process_birth_date(birth_date, user_name, timezone, channel, current_birth_d
     :param timezone: String - the user's timezone
     :param channel: String - the channel were the birthday was posted
     :param current_birth_date: Arrow datetime object - existing birthday in the database
-    :return: None - message is posted to the channel
+    :return: String - message to be posted to the channel
     """
     if birth_date:
         if current_birth_date:
@@ -296,8 +296,7 @@ def process_birth_date(birth_date, user_name, timezone, channel, current_birth_d
     else:
         response = ":thinking_face:, was there a date in there?"
 
-    # post the message
-    post_message(response, channel)
+    return response
 
 
 def reminders_check():
@@ -368,7 +367,8 @@ def run_bot():
                 if "help" in message.lower():
                     post_message(display_help(), channel)
                 elif "birthday" in message and birth_date:
-                    process_birth_date(birth_date, user_name, timezone, channel, current_birth_date)
+                    post_message(process_birth_date(birth_date, user_name, timezone, channel, current_birth_date),
+                                 channel)
                 elif "birthday" in message and current_birth_date:
                     current = arrow.get(current_birth_date)
                     countdown = days_left_to_birthday(current, timezone)
