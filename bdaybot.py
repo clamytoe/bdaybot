@@ -343,7 +343,7 @@ def update_reminders(user_name, birth_date, timezone, channel):
             db.delete_reminder(r[0])
 
     next_birth_date = calculate_next_birth_date(birth_date, timezone)
-    next_birth_date_utc = adjust_date_with_timezone(next_birth_date)
+    next_birth_date_utc = adjust_date_with_timezone(next_birth_date, timezone)
     r_status = db.create_reminder(user_name, next_birth_date_utc, channel)
     return r_status
 
