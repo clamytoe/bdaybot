@@ -34,6 +34,21 @@ conda env create -f environment.yml
 source activate bdaybot
 ```
 
+### How to use
+Once the bot is up and running and you've added it to one of your slack channels, it'll simply respond to any message directed towards it. It's not smart, any messagge to it should contain the **birthday** keyword.
+
+![sample](img/bday_sample.png)
+
+If a date is not included in the message and you have already given it your birthday before, it will return the number of days left for it.
+
+![next_birthday](img/bday_check.png)
+
+Now it is pretty smart about filtering out different date formats, it just defaults to accepting the month before the day; sorry International users! You don't even have to supply a year for that matter!
+
+![next_tuesday](img/bday_parsing.png)
+
+It automatically takes into account the users TimeZone and will give them a random birthday message at 09:00AM their local time. We didn't want it to wake anybody up at midnight!
+
 [python-version]:https://img.shields.io/badge/python-3.6%2B-brightgreen.svg
 [travis-image]:https://travis-ci.org/clamytoe/pguide.svg?branch=master
 [travis-url]:https://travis-ci.org/clamytoe/pguide
