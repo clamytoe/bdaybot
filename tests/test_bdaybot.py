@@ -69,11 +69,13 @@ def test_parse_message():
     assert result.year == 1972
     assert result.month == 12
     assert result.day == 6
-    failed = parse_message('<@U8DER4W6N> good morning bot!', TZ)
-    assert failed is None
 
 
 def test_parse_message_failed():
     message = '<@U8DER4W6N> good morning bot!'
     result = parse_message(message, TZ)
     assert result is None
+    # test for rare case where year is completely out of range
+    message = "<@U8DER4W6N> my birthday is in 100 days haha don't expect that to work"
+    parsed_date = parse_message(message, TZ)
+    assert parsed_date is None

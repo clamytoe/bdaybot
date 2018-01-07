@@ -261,7 +261,7 @@ def parse_message(message, timezone):
     try:
         b_day = parse(message, fuzzy=True)
         birthday = arrow.get(b_day, tz.gettz(timezone))
-        return birthday
+        return None if birthday.year < 1900 else birthday
     except (ValueError, TypeError):
         return None
 
