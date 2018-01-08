@@ -15,6 +15,6 @@ if __name__ == "__main__":
         for user in users:
             # print(f'USERS: {user}')
             if 'name' in user and user['name'] == BOT_NAME:
-                print(f'Bot ID for "{user["name"]}" is {user["id"]}')
+                print('Bot ID for "{0}" is {1}'.format(user["name"], user["id"]))
     else:
-        print(f'could not find bot user with the name {BOT_NAME}')
+        print('could not find bot user with the name {}'.format(BOT_NAME))
