@@ -110,10 +110,10 @@ def display_help():
     :return: String - help message
     """
     response = """
-        Tag me and say:
-        * 'help' to display this message again.
-        * 'birthday' followed by your birth date for me to save it.
-        * 'birthday' without a date, to find out how many more days are left for you next birthday.
+    Tag me and say:
+    *help* - display this message.
+    *birthday* - followed by your birth date for me to save it.
+    *birthday* - without a date, to find out how many more days are left for you next birthday.
     """
     return response
 
