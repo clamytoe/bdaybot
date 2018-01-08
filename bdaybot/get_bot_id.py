@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from config import SLACK_BOT_TOKEN
 from slackclient import SlackClient
+
+from bdaybot.config import SLACK_BOT_TOKEN
 
 BOT_NAME = 'bdaybot'
 

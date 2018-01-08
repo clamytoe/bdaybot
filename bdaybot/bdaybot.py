@@ -2,15 +2,14 @@ from functools import lru_cache
 from random import choice
 from time import sleep
 
-from apscheduler.schedulers.background import BackgroundScheduler
 import arrow
-from dateutil.parser import parse
+import bdaybot.bd_db as db
+from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil import tz
+from dateutil.parser import parse
 from slackclient import SlackClient
 
-
-import bd_db as db
-from config import BOT_ID, SLACK_BOT_TOKEN
+from bdaybot.config import BOT_ID, SLACK_BOT_TOKEN
 
 # connect to the Slack API
 SLACK_CLIENT = SlackClient(SLACK_BOT_TOKEN)
@@ -325,7 +324,7 @@ def reminders_check():
             # then we delete the expired reminder
             db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
-            db.create_reminder(r_user, r_date.replace(year = r_date.year + 1), r_channel)
+            db.create_reminder(r_user, r_date.replace(year=r_date.year+1), r_channel)
 
 
 def update_reminders(user_name, birth_date, timezone, channel):

@@ -1,9 +1,9 @@
 import arrow
-from dateutil.parser import parse
 import pytest
+from dateutil.parser import parse
 
-from bdaybot import add_reminder
-import bd_db as db
+from bdaybot.bdaybot import add_reminder
+import bdaybot.bd_db as db
 
 BD = parse('12/06/1972')
 ABD = arrow.get(BD)

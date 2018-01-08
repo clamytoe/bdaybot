@@ -2,9 +2,17 @@ language: python
 cache:
   - pip
 python:
-  - 3.6.3
+  - 3.4
+  - 3.5
+  - 3.6
+env:
+  matrix:
+    - TOXENV=py
 install:
   - pip install -U setuptools
   - pip install -r requirements.txt
 script:
+  - flake8 . --max-line-length=120
+  - isort
+  - tox
   - python -m pytest -v

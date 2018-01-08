@@ -3,7 +3,7 @@ import datetime
 import arrow
 import pytest
 
-from bdaybot import calculate_today, parse, calculate_next_birth_date, parse_message, \
+from bdaybot.bdaybot import calculate_today, parse, calculate_next_birth_date, parse_message, \
     adjust_date_with_timezone, days_left_to_birthday
 
 BD = parse('12/06/1972')
