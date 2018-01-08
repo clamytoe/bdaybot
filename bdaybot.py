@@ -316,16 +316,16 @@ def reminders_check():
         r_user, r_date, r_channel = db.retrieve_reminder_data(r_id)
         if not r_user:
             continue
-        r_date = arrow.get(r_date).to('local')
+        r_date_local = arrow.get(r_date).to('local')
         now = arrow.now().datetime
-        if r_date.strftime('%m/%d/%y %H') == now.strftime('%m/%d/%y %H'):
+        if r_date_local.strftime('%m/%d/%y %H') == now.strftime('%m/%d/%y %H'):
             # generate greeting and post it
             greeting = pick_random_message()
             post_message('<@{0}>, {1}'.format(r_user, greeting), r_channel)
             # then we delete the expired reminder
             db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
-            db.create_reminder(r_user, r_date.shift(years=1).datetime, r_channel)
+            db.create_reminder(r_user, r_date.replace(year = r_date.year + 1), r_channel)
 
 
 def update_reminders(user_name, birth_date, timezone, channel):
