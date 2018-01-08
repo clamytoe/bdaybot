@@ -15,7 +15,7 @@ from config import BOT_ID, SLACK_BOT_TOKEN
 # connect to the Slack API
 SLACK_CLIENT = SlackClient(SLACK_BOT_TOKEN)
 
-AT_BOT = f'<@{BOT_ID}>'
+AT_BOT = '<@{}>'.format(BOT_ID)
 READ_DELAY = 1
 
 
@@ -109,10 +109,12 @@ def display_help():
 
     :return: String - help message
     """
-    response = "Tag me and say 'help' to display this message again.\n" \
-               "Tag me and say 'birthday' <your-birth-date-here> (sans the '<' and '>') for me to register" \
-               " your birthday, I will take your timezone into account!.\n" \
-               "Tag me and say 'birthday' for me to tell you when your birthday is coming."
+    response = """
+        Tag me and say:
+        * 'help' to display this message again.
+        * 'birthday' followed by your birth date for me to save it.
+        * 'birthday' without a date, to find out how many more days are left for you next birthday.
+    """
     return response
 
 
@@ -132,9 +134,9 @@ def handle_add_new_user(user_name, birth_date, timezone, channel):
     r_status = add_reminder(user_name, adjusted_birthday, timezone, channel)
 
     if status and r_status:
-        response = f"Thanks, I've saved *{pp_bday}* as your birthday. :wink:"
+        response = "Thanks, I've saved *{}* as your birthday. :wink:".format(pp_bday)
     else:
-        response = f"Sorry, but for some unknown reason, I wasn't able to add *{pp_bday}* as your birthday..."
+        response = "Sorry, but for some unknown reason, I wasn't able to add *{}* as your birthday...".format(pp_bday)
     return response
 
 
@@ -154,16 +156,16 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
     pp_current = pp_date(current_birth_date)
 
     if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
-        response = f":confused: I already have your birthday set. You still have *{countdown}* days more, " \
-                   f"so please be patient! :ok_hand:"
+        response = ":confused: I already have your birthday set. You still have *{}* days more, " \
+                   "so please be patient! :ok_hand:".format(countdown)
     else:
         status = db.modify_birthday(user_name, birth_date.datetime, timezone)
         adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
         r_status = update_reminders(user_name, adjusted_birthday, timezone, channel)
         if status and r_status:
-            response = f"Sure thing, I've changed your birthday from *{pp_current}* to *{pp_bday}*."
+            response = "Sure thing, I've changed your birthday from *{0}* to *{1}*.".format(pp_current, pp_bday)
         else:
-            response = f"Sorry but I couldn't change your birthday from *{pp_current}* to *{pp_bday}*."
+            response = "Sorry but I couldn't change your birthday from *{0}* to *{1}*.".format(pp_current, pp_bday)
     return response
 
 
@@ -191,8 +193,8 @@ def lookup_user(user_id):
     :return: String - Username of the user
     """
     user_info = SLACK_CLIENT.api_call('users.info', user=user_id)
-    user_name = f'{user_info["user"]["name"]}'
-    user_tz = f'{user_info["user"]["tz"]}'
+    user_name = '{}'.format(user_info["user"]["name"])
+    user_tz = '{}'.format(user_info["user"]["tz"])
     return user_name, user_tz
 
 
@@ -319,7 +321,7 @@ def reminders_check():
         if r_date.strftime('%m/%d/%y %H') == now.strftime('%m/%d/%y %H'):
             # generate greeting and post it
             greeting = pick_random_message()
-            post_message(f'<@{r_user}>, {greeting}', r_channel)
+            post_message('<@{0}>, {1}'.format(r_user, greeting), r_channel)
             # then we delete the expired reminder
             db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
@@ -375,7 +377,7 @@ def run_bot():
                     current = arrow.get(current_birth_date)
                     countdown = days_left_to_birthday(current, timezone)
                     days = 'day' if countdown <= 1 else 'days'
-                    response = f"You have *{countdown}* {days} left for your next birthday!"
+                    response = "You have *{0}* {1} left for your next birthday!".format(countdown, days)
                     post_message(response, channel)
             sleep(READ_DELAY)
     else:
