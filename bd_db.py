@@ -29,7 +29,9 @@ class Birthday(Base):
         self.timezone = timezone
 
     def __repr__(self):
-        return f"<Birthday (username={self.username}, birth_date={self.birth_date}, timezone={self.timezone})>"
+        return "<Birthday (username={0}, birth_date={1}, timezone={2})>".format(self.username,
+                                                                                self.birth_date,
+                                                                                self.timezone)
 
 
 class Reminder(Base):
@@ -49,7 +51,7 @@ class Reminder(Base):
         self.channel = channel
 
     def __repr__(self):
-        return f"<Reminder (username={self.username}, birthday={self.birthday}, channel={self.channel})>"
+        return "<Reminder (username={0}, birthday={1}, channel={2})>".format(self.username, self.birthday, self.channel)
 
 
 # create tables
