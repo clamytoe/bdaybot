@@ -1,10 +1,9 @@
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
+                        create_engine)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-
+from sqlalchemy.orm import relationship, sessionmaker
 
 engine = create_engine('sqlite:///bdayb.db', echo=True)
 Base = declarative_base()
