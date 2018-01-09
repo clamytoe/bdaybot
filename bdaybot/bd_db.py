@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
-                        create_engine)
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, create_engine)
+from sqlalchemy import exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -65,7 +65,7 @@ def session_scope():
     try:
         yield session
         session.commit()
-    except:
+    except exc.SQLAlchemyError:
         session.rollback()
         raise
     finally:
@@ -86,7 +86,7 @@ def create_birthday(user, birth_date, timezone):
         with session_scope() as session:
             session.add(new_birthday)
         return True
-    except:
+    except exc.SQLAlchemyError:
         return False
 
 
@@ -107,7 +107,7 @@ def modify_birthday(user, birth_date, timezone):
             res.birth_date = birth_date
             res.timezone = timezone
         return True
-    except:
+    except exc.SQLAlchemyError:
         return False
 
 
@@ -125,7 +125,7 @@ def delete_birthday(user):
                 return False
             session.delete(res)
         return True
-    except:
+    except exc.SQLAlchemyError:
         return False
 
 
@@ -162,6 +162,7 @@ def create_reminder(user, birthday, channel):
 
     :param user: String - User name
     :param birthday: datetime.datetime - The birthday of the user, timezone-adjusted for the bot
+    :param channel: String - channel message was posted from
 
     :return: bool - True if successful, else False
     """
@@ -188,7 +189,7 @@ def delete_reminder(r_id):
                 return False
             session.delete(res)
         return True
-    except:
+    except exc.SQLAlchemyError:
         return False
 
 
