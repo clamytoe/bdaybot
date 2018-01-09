@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, create_engine)
-from sqlalchemy import exc
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
+                        create_engine, exc)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
