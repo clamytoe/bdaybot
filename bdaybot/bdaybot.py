@@ -3,12 +3,12 @@ from random import choice
 from time import sleep
 
 import arrow
-import bdaybot.bd_db as db
 from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil import tz
 from dateutil.parser import parse
 from slackclient import SlackClient
 
+import bdaybot.bd_db as db
 from bdaybot.config import BOT_ID, SLACK_BOT_TOKEN
 
 # connect to the Slack API
