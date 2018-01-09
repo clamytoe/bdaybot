@@ -35,10 +35,18 @@ conda env create -f environment.yml
 source activate bdaybot
 ```
 
+### Package Installation
+
+```bash
+python setup.py install
+```
+
 ### How to use
 Before you can start the bot you are going to have to set a couple of environment variables on your system:
 
 **BOT_ID** and **SLACK_BOT_TOKEN**
+
+To start it simply use the command `bdaybot`
 
 Once the bot is up and running and you've added it to one of your slack channels, it'll simply respond to any message directed towards it. It's not smart, any message to it should contain the **birthday** keyword.
 
