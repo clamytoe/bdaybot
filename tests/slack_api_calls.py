@@ -25,7 +25,8 @@ api_users_list = {
                 'image_192': 'https://avatars.slack-edge.com/2017-12-12/284990855921_c4857b4184c779ec4f8e_192.png',
                 'image_512': 'https://avatars.slack-edge.com/2017-12-12/284990855921_c4857b4184c779ec4f8e_512.png',
                 'image_1024': 'https://avatars.slack-edge.com/2017-12-12/284990855921_c4857b4184c779ec4f8e_1024.png',
-                'image_original': 'https://avatars.slack-edge.com/2017-12-12/284990855921_c4857b4184c779ec4f8e_original.png',
+                'image_original': 'https://avatars.slack-edge.com/2017-12-12'
+                                  '/284990855921_c4857b4184c779ec4f8e_original.png',
                 'title': 'Give it your birthday and it will send you a birthday greeting on your birthday!',
                 'first_name': 'Birthday',
                 'last_name': 'Bot',
@@ -60,12 +61,18 @@ api_users_list = {
                 'real_name_normalized': 'Dante Septem',
                 'display_name_normalized': 'dseptem',
                 'email': 'dseptem@gmail.com',
-                'image_24': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=24&d=https%3A%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-24.png',
-                'image_32': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=32&d=https%3A%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-32.png',
-                'image_48': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-48.png',
-                'image_72': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=72&d=https%3A%2F%2Fa.slack-edge.com%2F3654%2Fimg%2Favatars%2Fava_0023-72.png',
-                'image_192': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-192.png',
-                'image_512': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=512&d=https%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-512.png',
+                'image_24': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=24&d=https%3A'
+                            '%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-24.png',
+                'image_32': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=32&d=https%3A'
+                            '%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-32.png',
+                'image_48': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=48&d=https%3A'
+                            '%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-48.png',
+                'image_72': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=72&d=https%3A'
+                            '%2F%2Fa.slack-edge.com%2F3654%2Fimg%2Favatars%2Fava_0023-72.png',
+                'image_192': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=192&d=https'
+                             '%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-192.png',
+                'image_512': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=512&d=https'
+                             '%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-512.png',
                 'team': 'T853A5AS2'
             },
             'is_admin': False,
@@ -100,12 +107,18 @@ api_users_info_dseptem = {
             'real_name_normalized': 'Dante Septem',
             'display_name_normalized': 'dseptem',
             'email': 'dseptem@gmail.com',
-            'image_24': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=24&d=https%3A%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-24.png',
-            'image_32': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=32&d=https%3A%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-32.png',
-            'image_48': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-48.png',
-            'image_72': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=72&d=https%3A%2F%2Fa.slack-edge.com%2F3654%2Fimg%2Favatars%2Fava_0023-72.png',
-            'image_192': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-192.png',
-            'image_512': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=512&d=https%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-512.png',
+            'image_24': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=24&d=https%3A%2F'
+                        '%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-24.png',
+            'image_32': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=32&d=https%3A%2F'
+                        '%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-32.png',
+            'image_48': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=48&d=https%3A%2F'
+                        '%2Fa.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0023-48.png',
+            'image_72': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=72&d=https%3A%2F'
+                        '%2Fa.slack-edge.com%2F3654%2Fimg%2Favatars%2Fava_0023-72.png',
+            'image_192': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=192&d=https%3A%2F'
+                         '%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-192.png',
+            'image_512': 'https://secure.gravatar.com/avatar/47aff711518c9bdd78aa5b0a10875899.jpg?s=512&d=https%3A%2F'
+                         '%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0023-512.png',
             'team': 'T853A5AS2'
         },
         'is_admin': False,
