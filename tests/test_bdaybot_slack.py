@@ -2,7 +2,7 @@
 import pytest
 from slackclient import SlackClient
 
-from bdaybot.bdaybot import lookup_user, SLACK_CLIENT
+from bdaybot.bdaybot import SLACK_CLIENT, lookup_user
 from bdaybot.config import BOT_ID, SLACK_BOT_TOKEN
 from tests.slack_api_calls import api_users_info_dseptem, api_users_list
 
