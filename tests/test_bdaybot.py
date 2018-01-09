@@ -3,8 +3,9 @@ import datetime
 import arrow
 import pytest
 
-from bdaybot.bdaybot import calculate_today, parse, calculate_next_birth_date, parse_message, \
-    adjust_date_with_timezone, days_left_to_birthday
+from bdaybot.bdaybot import (adjust_date_with_timezone,
+                             calculate_next_birth_date, calculate_today,
+                             days_left_to_birthday, parse, parse_message)
 
 BD = parse('12/06/1972')
 ABD = arrow.get(BD)
