@@ -34,5 +34,4 @@ setup(
     ''',
 )
 
-print(f'\n\n\t\t    '
-      'BDayBot version {VERSION} installation succeeded.\n')
+print('\n\n\t\t    BDayBot version {} installation succeeded.\n'.format(VERSION))
