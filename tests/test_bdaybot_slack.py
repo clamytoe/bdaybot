@@ -14,7 +14,7 @@ def slack_client():
 
 def test_environment_variables():
     assert len(BOT_ID) == 9
-    assert SLACK_BOT_TOKEN.startswith("xoxb") is True
+    assert SLACK_BOT_TOKEN.startswith("xox") is True
 
 
 def test_slack_client(slack_client):
