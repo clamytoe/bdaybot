@@ -37,22 +37,28 @@ def add_reminder(user_name, birth_date, timezone, channel):
 
 def adjust_date_with_timezone(date, timezone):
     """
-    Returns the provided date + timezone adjusted to the local timezone of this script, set to 9am.
+    Returns the provided date + timezone adjusted to the local timezone of this
+    script, set to 9am.
 
     :param date: Datetime / Basic datetime object - user's birthdate
     :param timezone: String - user's local timezone
     :return: Datetime - the adjusted datetime object in UTC tz
     """
     date = arrow.get(date)
-    date_with_user_timezone = date.to(timezone).replace(hour=9, minute=0, second=0)
+    date_with_user_timezone = date.to(timezone).replace(
+        hour=9,
+        minute=0,
+        second=0)
     adjusted_date = date_with_user_timezone.to("local")
     return adjusted_date.to("utc").datetime
 
 
 def calculate_next_birth_date(birth_date, timezone):
-    # TODO: Can easily be replaced by Arrow's shift function: remove this and refactor?
+    # TODO: Can easily be replaced by Arrow's shift function: remove this
+    # and refactor?
     """
-    Calculates the next birthday from the given birthday and timezone of the user.
+    Calculates the next birthday from the given birthday and timezone of
+    the user.
 
     :param birth_date: Arrow datetime object - the user's birthday
     :param timezone: String - the user's timezone
@@ -73,7 +79,8 @@ def calculate_next_birth_date(birth_date, timezone):
 def calculate_today(timezone):
     # TODO: Just a shortcut for an arrow function, testing is unneeded
     """
-    Calculates today's date, adjusts it's timezone and converts it into an arrow datetime object.
+    Calculates today's date, adjusts it's timezone and converts it into an
+    arrow datetime object.
 
     :param timezone: String - the timezone of the user.
     :return: Arrow datetime object
@@ -112,7 +119,8 @@ def display_help():
     Tag me and say:
     *help* - display this message.
     *birthday* - followed by your birth date for me to save it.
-    *birthday* - without a date, to find out how many more days are left for you next birthday.
+    *birthday* - without a date, to find out how many more days are left for 
+    your next birthday.
     """
     return response
 
@@ -129,19 +137,27 @@ def handle_add_new_user(user_name, birth_date, timezone, channel):
     """
     pp_bday = pp_date(birth_date)
     status = db.create_birthday(user_name, birth_date.datetime, timezone)
-    adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
+    adjusted_birthday = adjust_date_with_timezone(
+        birth_date.datetime,
+        timezone,
+    )
     r_status = add_reminder(user_name, adjusted_birthday, timezone, channel)
 
     if status and r_status:
-        response = "Thanks, I've saved *{}* as your birthday. :wink:".format(pp_bday)
+        response = f"Thanks, I've saved *{pp_bday}* as your birthday. :wink:"
     else:
-        response = "Sorry, but for some unknown reason, I wasn't able to add *{}* as your birthday...".format(
-            pp_bday
-        )
+        response = f"Sorry, but for some unknown reason, I wasn't able to " \
+                   f"add *{pp_bday}* as your birthday..."
     return response
 
 
-def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_date):
+def handle_user_exists(
+        user_name,
+        birth_date,
+        timezone,
+        channel,
+        current_birth_date,
+):
     """
     Handles the event where the user already exists in the database.
 
@@ -149,7 +165,8 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
     :param birth_date: Arrow datetime - user's birth date
     :param timezone: String - user's local timezone
     :param channel: String - the channel were the birthday was posted
-    :param current_birth_date: Datetime - the birth date that is currently in the database
+    :param current_birth_date: Datetime - the birth date that is currently in
+           the database
     :return: String - response message to the user
     """
     countdown = days_left_to_birthday(birth_date, timezone)
@@ -157,21 +174,27 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
     pp_current = pp_date(current_birth_date)
 
     if str(current_birth_date).split("T")[0] == str(birth_date).split("T")[0]:
-        response = ":confused: I already have your birthday set. You still have *{}* days more, " "so please be patient! :ok_hand:".format(
-            countdown
-        )
+        response = f":confused: I already have your birthday set. You still " \
+                   f"have *{countdown}* days more, so please be patient! " \
+                   f":ok_hand: "
     else:
         status = db.modify_birthday(user_name, birth_date.datetime, timezone)
-        adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
-        r_status = update_reminders(user_name, adjusted_birthday, timezone, channel)
+        adjusted_birthday = adjust_date_with_timezone(
+            birth_date.datetime,
+            timezone,
+        )
+        r_status = update_reminders(
+            user_name,
+            adjusted_birthday,
+            timezone,
+            channel,
+        )
         if status and r_status:
-            response = "Sure thing, I've changed your birthday from *{0}* to *{1}*.".format(
-                pp_current, pp_bday
-            )
+            response = f"Sure thing, I've changed your birthday from " \
+                       f"*{pp_current}* to *{pp_bday}*. "
         else:
-            response = "Sorry but I couldn't change your birthday from *{0}* to *{1}*.".format(
-                pp_current, pp_bday
-            )
+            response = f"Sorry but I couldn't change your birthday from " \
+                       f"*{pp_current}* to *{pp_bday}*."
     return response
 
 
@@ -211,7 +234,8 @@ def parse_slack_output(slack_rtm_output):
     Returns None unless a message is directed at the Bot, based on its ID.
 
     :param slack_rtm_output: List - contents of RTM Slack Read
-    :return: Tuple - (None, None, None, None) or (message, channel, username, timezone)
+    :return: Tuple - (None, None, None, None) or (message, channel, username,
+             timezone)
     """
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
@@ -231,17 +255,25 @@ def pick_random_message():
     :return: String - a birthday greeting
     """
     greetings = [
-        "I hope your special day will bring you lots of happiness, love and fun. You deserve them a lot. Enjoy!",
-        "Have a wonderful birthday. I wish your every day to be filled with lots of love, laughter, happiness and the "
+        "I hope your special day will bring you lots of happiness, love and "
+        "fun. You deserve them a lot. Enjoy!",
+        "Have a wonderful birthday. I wish your every day to be filled with "
+        "lots of love, laughter, happiness and the "
         "warmth of sunshine.",
-        "May your coming year surprise you with the happiness of smiles, the feeling of love and so on. I hope you "
-        "will find plenty of sweet memories to cherish forever. Happy birthday.",
-        "May this birthday be filled with lots of happy hours and also your life with many happy birthdays, "
+        "May your coming year surprise you with the happiness of smiles, the "
+        "feeling of love and so on. I hope you "
+        "will find plenty of sweet memories to cherish forever. Happy "
+        "birthday.",
+        "May this birthday be filled with lots of happy hours and also your "
+        "life with many happy birthdays, "
         "that are yet to come. Happy birthday.",
-        "Let’s light the candles and celebrate this special day of your life. Happy birthday.",
-        "Special day, special person and special celebration. May all your dreams and desires come true in this "
+        "Let’s light the candles and celebrate this special day of your life."
+        " Happy birthday.",
+        "Special day, special person and special celebration. May all your "
+        "dreams and desires come true in this "
         "coming year. Happy birthday.",
-        "If you truly believe in yourself, everybody will believe in you too. I believe you have what it takes to "
+        "If you truly believe in yourself, everybody will believe in you too."
+        " I believe you have what it takes to "
         "succeed at anything. Happy birthday!",
     ]
     return choice(greetings)
@@ -256,7 +288,8 @@ def post_message(response, channel):
     :return: None
     """
     SLACK_CLIENT.api_call(
-        "chat.postMessage", channel=channel, text=response, as_user=True, link_names=1
+        "chat.postMessage", channel=channel, text=response, as_user=True,
+        link_names=1
     )
 
 
@@ -288,15 +321,18 @@ def pp_date(date):
     return date.format("MMMM D, YYYY")
 
 
-def process_birth_date(birth_date, user_name, timezone, channel, current_birth_date):
+def process_birth_date(birth_date, user_name, timezone, channel,
+                       current_birth_date):
     """
     Processes the given date and returns the proper response to the channel.
 
     :param birth_date: datetime object
-    :param user_name: String - the user name of the person entering/changing their birthday
+    :param user_name: String - the user name of the person entering/changing
+           their birthday
     :param timezone: String - the user's timezone
     :param channel: String - the channel were the birthday was posted
-    :param current_birth_date: Arrow datetime object - existing birthday in the database
+    :param current_birth_date: Arrow datetime object - existing birthday in
+           the database
     :return: String - message to be posted to the channel
     """
     if birth_date:
@@ -305,7 +341,8 @@ def process_birth_date(birth_date, user_name, timezone, channel, current_birth_d
                 user_name, birth_date, timezone, channel, current_birth_date
             )
         else:
-            response = handle_add_new_user(user_name, birth_date, timezone, channel)
+            response = handle_add_new_user(user_name, birth_date, timezone,
+                                           channel)
     else:
         response = ":thinking_face:, was there a date in there?"
 
@@ -315,7 +352,8 @@ def process_birth_date(birth_date, user_name, timezone, channel, current_birth_d
 def reminders_check():
     """
     Retrieves all reminders and compares their date with the current one.
-    If a birthday is found, it sends a birthday greeting, deletes the reminder and schedules the one for the next year.
+    If a birthday is found, it sends a birthday greeting, deletes the reminder
+    and schedules the one for the next year.
 
     :return: None
     """
@@ -335,14 +373,16 @@ def reminders_check():
             # then we delete the expired reminder
             db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
-            db.create_reminder(r_user, r_date.replace(year=r_date.year + 1), r_channel)
+            db.create_reminder(r_user, r_date.replace(year=r_date.year + 1),
+                               r_channel)
 
 
 def update_reminders(user_name, birth_date, timezone, channel):
     """
     Updates the reminders database.
 
-    :param user_name: String - the user name of the person entering/changing their birthday
+    :param user_name: String - the user name of the person entering/changing
+           their birthday
     :param birth_date: datetime object
     :param timezone: String - the user's timezone
     :param channel: String - the channel were the birthday was posted
@@ -370,7 +410,8 @@ def run_bot():
         print("Bot connected and running!")
 
         reminders_scheduler = BackgroundScheduler()
-        reminders_scheduler.add_job(reminders_check, "cron", hour="*", minute=0)
+        reminders_scheduler.add_job(reminders_check, "cron", hour="*",
+                                    minute=0)
         reminders_scheduler.start()
 
         while True:
@@ -385,7 +426,8 @@ def run_bot():
                 elif "birthday" in message and birth_date:
                     post_message(
                         process_birth_date(
-                            birth_date, user_name, timezone, channel, current_birth_date
+                            birth_date, user_name, timezone, channel,
+                            current_birth_date
                         ),
                         channel,
                     )
@@ -393,9 +435,8 @@ def run_bot():
                     current = arrow.get(current_birth_date)
                     countdown = days_left_to_birthday(current, timezone)
                     days = "day" if countdown <= 1 else "days"
-                    response = "You have *{0}* {1} left for your next birthday!".format(
-                        countdown, days
-                    )
+                    response = f"You have *{countdown}* {days} left for " \
+                               f"your next birthday!"
                     post_message(response, channel)
             sleep(READ_DELAY)
     else:
