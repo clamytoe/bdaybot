@@ -3,30 +3,47 @@ import datetime
 import arrow
 import pytest
 
-from bdaybot.bdaybot import (adjust_date_with_timezone,
-                             calculate_next_birth_date, calculate_today,
-                             days_left_to_birthday, parse, parse_message)
+from bdaybot.bdaybot import (
+    adjust_date_with_timezone,
+    calculate_next_birth_date,
+    calculate_today,
+    days_left_to_birthday,
+    parse,
+    parse_message,
+)
 
-BD = parse('12/06/1972')
+BD = parse("12/06/1972")
 ABD = arrow.get(BD)
-TZ = 'America/Chicago'
+TZ = "America/Chicago"
 ABDTZ = ABD.to(TZ)
 
 
 def test_adjust_date_with_timezone_ok():
-    adj_date = adjust_date_with_timezone(datetime.datetime(day=6, month=1, year=1987), 'America/Argentina/Buenos_Aires')
-    assert adj_date == datetime.datetime(1987, 1, 5, 12, 0, tzinfo=datetime.timezone.utc)
-    adj_date = adjust_date_with_timezone(datetime.datetime(day=25, month=4, year=1994), 'Africa/Nouakchott')
-    assert adj_date == datetime.datetime(1994, 4, 25, 9, 0, tzinfo=datetime.timezone.utc)
-    adj_date = adjust_date_with_timezone(datetime.datetime(day=11, month=7, year=1973), 'America/Los_Angeles')
-    assert adj_date == datetime.datetime(1973, 7, 10, 16, 0, tzinfo=datetime.timezone.utc)
+    adj_date = adjust_date_with_timezone(
+        datetime.datetime(day=6, month=1, year=1987), "America/Argentina/Buenos_Aires"
+    )
+    assert (
+        adj_date == datetime.datetime(1987, 1, 5, 12, 0, tzinfo=datetime.timezone.utc)
+    )
+    adj_date = adjust_date_with_timezone(
+        datetime.datetime(day=25, month=4, year=1994), "Africa/Nouakchott"
+    )
+    assert (
+        adj_date == datetime.datetime(1994, 4, 25, 9, 0, tzinfo=datetime.timezone.utc)
+    )
+    adj_date = adjust_date_with_timezone(
+        datetime.datetime(day=11, month=7, year=1973), "America/Los_Angeles"
+    )
+    assert (
+        adj_date == datetime.datetime(1973, 7, 10, 16, 0, tzinfo=datetime.timezone.utc)
+    )
 
 
 def test_adjust_date_with_timezone_fail():
     with pytest.raises(arrow.parser.ParserError):
-        adjust_date_with_timezone(datetime.datetime(day=6, month=1, year=1987), 'Blah')
+        adjust_date_with_timezone(datetime.datetime(day=6, month=1, year=1987), "Blah")
     with pytest.raises(arrow.parser.ParserError):
-        adjust_date_with_timezone('6th january 1987', 'America/Argentina/Buenos_Aires')
+        adjust_date_with_timezone("6th january 1987", "America/Argentina/Buenos_Aires")
     with pytest.raises(TypeError):
         adjust_date_with_timezone(None, None)
 
@@ -34,8 +51,8 @@ def test_adjust_date_with_timezone_fail():
 def test_globals():
     assert isinstance(BD, datetime.datetime)
     assert isinstance(ABD, arrow.Arrow)
-    assert str(ABD.datetime) == '1972-12-06 00:00:00+00:00'
-    assert str(ABDTZ.datetime) == '1972-12-05 18:00:00-06:00'
+    assert str(ABD.datetime) == "1972-12-06 00:00:00+00:00"
+    assert str(ABDTZ.datetime) == "1972-12-05 18:00:00-06:00"
 
 
 def test_calculate_today():
@@ -49,13 +66,13 @@ def test_calculate_today():
 def test_calculate_next_birth_date():
     date = calculate_next_birth_date(ABD, TZ)
     assert isinstance(date, arrow.Arrow)
-    assert str(date.datetime) == '2018-12-05 18:00:00-06:00'
+    assert str(date.datetime) == "2018-12-05 18:00:00-06:00"
 
 
 def test_adjust_date_with_timezone():
     adjusted_date = adjust_date_with_timezone(ABD, TZ)
     assert isinstance(adjusted_date, datetime.datetime)
-    assert str(adjusted_date) == '1972-12-05 15:00:00+00:00'
+    assert str(adjusted_date) == "1972-12-05 15:00:00+00:00"
 
 
 def test_days_left_to_birthday():
@@ -64,7 +81,7 @@ def test_days_left_to_birthday():
 
 
 def test_parse_message():
-    message = '<@U8DER4W6N> birthday 12/6/72'
+    message = "<@U8DER4W6N> birthday 12/6/72"
     result = parse_message(message, TZ)
     assert isinstance(result, arrow.Arrow)
     assert result.year == 1972
@@ -73,7 +90,7 @@ def test_parse_message():
 
 
 def test_parse_message_failed():
-    message = '<@U8DER4W6N> good morning bot!'
+    message = "<@U8DER4W6N> good morning bot!"
     result = parse_message(message, TZ)
     assert result is None
     # test for rare case where year is completely out of range

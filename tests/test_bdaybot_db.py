@@ -5,30 +5,34 @@ from dateutil.parser import parse
 import bdaybot.bd_db as db
 from bdaybot.bdaybot import add_reminder
 
-BD = parse('12/06/1972')
+BD = parse("12/06/1972")
 ABD = arrow.get(BD)
-TZ = 'America/Chicago'
+TZ = "America/Chicago"
 ABDTZ = ABD.to(TZ)
-USER = 'test_dummy'
+USER = "test_dummy"
 
 
 def test_add_reminder_ok(monkeypatch):
+
     def mock_db_create(username, bday, channel):
         return True
-    monkeypatch.setattr(db, 'create_reminder', mock_db_create)
-    status = add_reminder(USER, ABD.datetime, TZ, 'general')
+
+    monkeypatch.setattr(db, "create_reminder", mock_db_create)
+    status = add_reminder(USER, ABD.datetime, TZ, "general")
     assert status is True
 
 
 def test_add_reminder_fail(monkeypatch):
+
     def mock_db_create_fail(username, bday, channel):
         return False
-    monkeypatch.setattr(db, 'create_reminder', mock_db_create_fail)
+
+    monkeypatch.setattr(db, "create_reminder", mock_db_create_fail)
     with pytest.raises(TypeError):
-        add_reminder(USER, 'not a datetime', TZ, 'general')
+        add_reminder(USER, "not a datetime", TZ, "general")
     with pytest.raises(TypeError):
-        add_reminder(USER, ABD, None, 'general')
-    status = add_reminder(USER, ABD, TZ, 'general')
+        add_reminder(USER, ABD, None, "general")
+    status = add_reminder(USER, ABD, TZ, "general")
     assert status is False
 
 
