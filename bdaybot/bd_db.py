@@ -1,11 +1,10 @@
 from contextlib import contextmanager
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
-                        create_engine, exc)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, create_engine, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
-engine = create_engine('sqlite:///bdayb.db', echo=True)
+engine = create_engine("sqlite:///bdayb.db", echo=True)
 Base = declarative_base()
 
 
@@ -28,9 +27,9 @@ class Birthday(Base):
         self.timezone = timezone
 
     def __repr__(self):
-        return "<Birthday (username={0}, birth_date={1}, timezone={2})>".format(self.username,
-                                                                                self.birth_date,
-                                                                                self.timezone)
+        return "<Birthday (username={0}, birth_date={1}, timezone={2})>".format(
+            self.username, self.birth_date, self.timezone
+        )
 
 
 class Reminder(Base):
@@ -38,7 +37,7 @@ class Reminder(Base):
     __tablename__ = "reminders"
 
     id = Column(Integer, primary_key=True)
-    username = Column(String, ForeignKey('birthdays.username'))
+    username = Column(String, ForeignKey("birthdays.username"))
     birthday = Column(DateTime)
     channel = Column(String)
 
@@ -50,7 +49,9 @@ class Reminder(Base):
         self.channel = channel
 
     def __repr__(self):
-        return "<Reminder (username={0}, birthday={1}, channel={2})>".format(self.username, self.birthday, self.channel)
+        return "<Reminder (username={0}, birthday={1}, channel={2})>".format(
+            self.username, self.birthday, self.channel
+        )
 
 
 # create tables

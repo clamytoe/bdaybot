@@ -14,7 +14,7 @@ from bdaybot.config import BOT_ID, SLACK_BOT_TOKEN
 # connect to the Slack API
 SLACK_CLIENT = SlackClient(SLACK_BOT_TOKEN)
 
-AT_BOT = '<@{}>'.format(BOT_ID)
+AT_BOT = "<@{}>".format(BOT_ID)
 READ_DELAY = 1
 
 
@@ -45,8 +45,8 @@ def adjust_date_with_timezone(date, timezone):
     """
     date = arrow.get(date)
     date_with_user_timezone = date.to(timezone).replace(hour=9, minute=0, second=0)
-    adjusted_date = date_with_user_timezone.to('local')
-    return adjusted_date.to('utc').datetime
+    adjusted_date = date_with_user_timezone.to("local")
+    return adjusted_date.to("utc").datetime
 
 
 def calculate_next_birth_date(birth_date, timezone):
@@ -78,7 +78,7 @@ def calculate_today(timezone):
     :param timezone: String - the timezone of the user.
     :return: Arrow datetime object
     """
-    return arrow.utcnow().to(timezone).floor('hour')  # discards the time
+    return arrow.utcnow().to(timezone).floor("hour")  # discards the time
 
 
 def days_left_to_birthday(birth_date, timezone):
@@ -91,8 +91,8 @@ def days_left_to_birthday(birth_date, timezone):
     """
     today = calculate_today(timezone)
     next_birth_date = calculate_next_birth_date(birth_date, timezone)
-    str_today = str(today).split('T')[0]
-    str_next_birth_date = str(next_birth_date).split('T')[0]
+    str_today = str(today).split("T")[0]
+    str_next_birth_date = str(next_birth_date).split("T")[0]
 
     if str_next_birth_date == str_today:
         return 0
@@ -135,7 +135,9 @@ def handle_add_new_user(user_name, birth_date, timezone, channel):
     if status and r_status:
         response = "Thanks, I've saved *{}* as your birthday. :wink:".format(pp_bday)
     else:
-        response = "Sorry, but for some unknown reason, I wasn't able to add *{}* as your birthday...".format(pp_bday)
+        response = "Sorry, but for some unknown reason, I wasn't able to add *{}* as your birthday...".format(
+            pp_bday
+        )
     return response
 
 
@@ -154,17 +156,22 @@ def handle_user_exists(user_name, birth_date, timezone, channel, current_birth_d
     pp_bday = pp_date(birth_date)
     pp_current = pp_date(current_birth_date)
 
-    if str(current_birth_date).split('T')[0] == str(birth_date).split('T')[0]:
-        response = ":confused: I already have your birthday set. You still have *{}* days more, " \
-                   "so please be patient! :ok_hand:".format(countdown)
+    if str(current_birth_date).split("T")[0] == str(birth_date).split("T")[0]:
+        response = ":confused: I already have your birthday set. You still have *{}* days more, " "so please be patient! :ok_hand:".format(
+            countdown
+        )
     else:
         status = db.modify_birthday(user_name, birth_date.datetime, timezone)
         adjusted_birthday = adjust_date_with_timezone(birth_date.datetime, timezone)
         r_status = update_reminders(user_name, adjusted_birthday, timezone, channel)
         if status and r_status:
-            response = "Sure thing, I've changed your birthday from *{0}* to *{1}*.".format(pp_current, pp_bday)
+            response = "Sure thing, I've changed your birthday from *{0}* to *{1}*.".format(
+                pp_current, pp_bday
+            )
         else:
-            response = "Sorry but I couldn't change your birthday from *{0}* to *{1}*.".format(pp_current, pp_bday)
+            response = "Sorry but I couldn't change your birthday from *{0}* to *{1}*.".format(
+                pp_current, pp_bday
+            )
     return response
 
 
@@ -191,9 +198,9 @@ def lookup_user(user_id):
     :param user_id: String - Slack ID of the user
     :return: String - Username of the user
     """
-    user_info = SLACK_CLIENT.api_call('users.info', user=user_id)
-    user_name = '{}'.format(user_info["user"]["name"])
-    user_tz = '{}'.format(user_info["user"]["tz"])
+    user_info = SLACK_CLIENT.api_call("users.info", user=user_id)
+    user_name = "{}".format(user_info["user"]["name"])
+    user_tz = "{}".format(user_info["user"]["tz"])
     return user_name, user_tz
 
 
@@ -209,10 +216,10 @@ def parse_slack_output(slack_rtm_output):
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
         for output in output_list:
-            if output and 'text' in output and AT_BOT in output['text']:
-                message = output['text'].split(AT_BOT)[1].strip().lower()
-                channel = output['channel']
-                username, timezone = lookup_user(output['user'])
+            if output and "text" in output and AT_BOT in output["text"]:
+                message = output["text"].split(AT_BOT)[1].strip().lower()
+                channel = output["channel"]
+                username, timezone = lookup_user(output["user"])
                 return message, channel, username, timezone
     return None, None, None, None
 
@@ -224,18 +231,18 @@ def pick_random_message():
     :return: String - a birthday greeting
     """
     greetings = [
-        'I hope your special day will bring you lots of happiness, love and fun. You deserve them a lot. Enjoy!',
-        'Have a wonderful birthday. I wish your every day to be filled with lots of love, laughter, happiness and the '
-        'warmth of sunshine.',
-        'May your coming year surprise you with the happiness of smiles, the feeling of love and so on. I hope you '
-        'will find plenty of sweet memories to cherish forever. Happy birthday.',
-        'May this birthday be filled with lots of happy hours and also your life with many happy birthdays, '
-        'that are yet to come. Happy birthday.',
-        'Let’s light the candles and celebrate this special day of your life. Happy birthday.',
-        'Special day, special person and special celebration. May all your dreams and desires come true in this '
-        'coming year. Happy birthday.',
-        'If you truly believe in yourself, everybody will believe in you too. I believe you have what it takes to '
-        'succeed at anything. Happy birthday!',
+        "I hope your special day will bring you lots of happiness, love and fun. You deserve them a lot. Enjoy!",
+        "Have a wonderful birthday. I wish your every day to be filled with lots of love, laughter, happiness and the "
+        "warmth of sunshine.",
+        "May your coming year surprise you with the happiness of smiles, the feeling of love and so on. I hope you "
+        "will find plenty of sweet memories to cherish forever. Happy birthday.",
+        "May this birthday be filled with lots of happy hours and also your life with many happy birthdays, "
+        "that are yet to come. Happy birthday.",
+        "Let’s light the candles and celebrate this special day of your life. Happy birthday.",
+        "Special day, special person and special celebration. May all your dreams and desires come true in this "
+        "coming year. Happy birthday.",
+        "If you truly believe in yourself, everybody will believe in you too. I believe you have what it takes to "
+        "succeed at anything. Happy birthday!",
     ]
     return choice(greetings)
 
@@ -248,7 +255,9 @@ def post_message(response, channel):
     :param channel: String - the channel were the response is to be posted to
     :return: None
     """
-    SLACK_CLIENT.api_call('chat.postMessage', channel=channel, text=response, as_user=True, link_names=1)
+    SLACK_CLIENT.api_call(
+        "chat.postMessage", channel=channel, text=response, as_user=True, link_names=1
+    )
 
 
 def parse_message(message, timezone):
@@ -276,7 +285,7 @@ def pp_date(date):
     """
     if not isinstance(date, arrow.arrow.Arrow):
         date = arrow.get(date)
-    return date.format('MMMM D, YYYY')
+    return date.format("MMMM D, YYYY")
 
 
 def process_birth_date(birth_date, user_name, timezone, channel, current_birth_date):
@@ -292,7 +301,9 @@ def process_birth_date(birth_date, user_name, timezone, channel, current_birth_d
     """
     if birth_date:
         if current_birth_date:
-            response = handle_user_exists(user_name, birth_date, timezone, channel, current_birth_date)
+            response = handle_user_exists(
+                user_name, birth_date, timezone, channel, current_birth_date
+            )
         else:
             response = handle_add_new_user(user_name, birth_date, timezone, channel)
     else:
@@ -315,16 +326,16 @@ def reminders_check():
         r_user, r_date, r_channel = db.retrieve_reminder_data(r_id)
         if not r_user:
             continue
-        r_date_local = arrow.get(r_date).to('local')
+        r_date_local = arrow.get(r_date).to("local")
         now = arrow.now().datetime
-        if r_date_local.strftime('%m/%d/%y %H') == now.strftime('%m/%d/%y %H'):
+        if r_date_local.strftime("%m/%d/%y %H") == now.strftime("%m/%d/%y %H"):
             # generate greeting and post it
             greeting = pick_random_message()
-            post_message('<@{0}>, {1}'.format(r_user, greeting), r_channel)
+            post_message("<@{0}>, {1}".format(r_user, greeting), r_channel)
             # then we delete the expired reminder
             db.delete_reminder(r_id)
             # and after that, we set up next year's reminder
-            db.create_reminder(r_user, r_date.replace(year=r_date.year+1), r_channel)
+            db.create_reminder(r_user, r_date.replace(year=r_date.year + 1), r_channel)
 
 
 def update_reminders(user_name, birth_date, timezone, channel):
@@ -356,32 +367,40 @@ def run_bot():
     :return: None
     """
     if SLACK_CLIENT.rtm_connect():
-        print('Bot connected and running!')
+        print("Bot connected and running!")
 
         reminders_scheduler = BackgroundScheduler()
-        reminders_scheduler.add_job(reminders_check, 'cron', hour='*', minute=0)
+        reminders_scheduler.add_job(reminders_check, "cron", hour="*", minute=0)
         reminders_scheduler.start()
 
         while True:
-            (message, channel, user_name, timezone) = parse_slack_output(SLACK_CLIENT.rtm_read())
+            (message, channel, user_name, timezone) = parse_slack_output(
+                SLACK_CLIENT.rtm_read()
+            )
             if message and channel:
                 birth_date = parse_message(message, timezone)
                 current_birth_date = lookup_birthday(user_name)[0]
                 if "help" in message.lower():
                     post_message(display_help(), channel)
                 elif "birthday" in message and birth_date:
-                    post_message(process_birth_date(birth_date, user_name, timezone, channel, current_birth_date),
-                                 channel)
+                    post_message(
+                        process_birth_date(
+                            birth_date, user_name, timezone, channel, current_birth_date
+                        ),
+                        channel,
+                    )
                 elif "birthday" in message and current_birth_date:
                     current = arrow.get(current_birth_date)
                     countdown = days_left_to_birthday(current, timezone)
-                    days = 'day' if countdown <= 1 else 'days'
-                    response = "You have *{0}* {1} left for your next birthday!".format(countdown, days)
+                    days = "day" if countdown <= 1 else "days"
+                    response = "You have *{0}* {1} left for your next birthday!".format(
+                        countdown, days
+                    )
                     post_message(response, channel)
             sleep(READ_DELAY)
     else:
-        print('Connection failed, invalid Slack TOKEN or bot ID?')
+        print("Connection failed, invalid Slack TOKEN or bot ID?")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_bot()
