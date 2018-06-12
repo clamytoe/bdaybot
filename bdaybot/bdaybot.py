@@ -18,6 +18,10 @@ AT_BOT = "<@{}>".format(BOT_ID)
 READ_DELAY = 1
 
 
+class BdayBot:
+    pass
+
+
 def add_reminder(user_name, birth_date, timezone, channel):
     """
     Add's a new entry into the reminders database.
