@@ -64,7 +64,7 @@ It automatically takes into account the users TimeZone and will give them a rand
 
 [python-version]:https://img.shields.io/badge/python-3.6%2B-brightgreen.svg
 [travis-image]:https://travis-ci.org/clamytoe/pguide.svg?branch=master
-[travis-url]:https://travis-ci.org/clamytoe/pguide
+[travis-url]:https://travis-ci.org/clamytoe/bdaybot
 [bch-image]:https://bettercodehub.com/edge/badge/clamytoe/bdaybot?branch=master
 [bch-url]:https://bettercodehub.com/
 [issues-image]:https://img.shields.io/github/issues/clamytoe/bdaybot.svg
