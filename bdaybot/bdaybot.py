@@ -1,3 +1,6 @@
+"""
+Slack birthday greeting bot.
+"""
 from functools import lru_cache
 from random import choice
 from time import sleep
@@ -13,6 +16,11 @@ from bdaybot.config import BOT_ID, SLACK_BOT_TOKEN, greetings
 
 
 class BdayBot:
+    """
+    Slack bot that will understand pretty wide range of date formats and set
+    it as the birthday of the user that's running the command. Will also
+    display how many days are left for the next upcoming birthday.
+    """
     READ_DELAY = 1
 
     def __init__(self, bot_id=BOT_ID, bot_token=SLACK_BOT_TOKEN):
