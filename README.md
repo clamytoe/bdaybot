@@ -2,6 +2,7 @@
 > Slack birthday management and greeting bot.
 
 The concept is simple. Tell the bot your birthday and when it comes around, get a nice little birthday message.
+In order to not wake anyone up at midnight, the messages are displayed at 09:00AM for the local time of the user.
 
 ![Python version][python-version]
 [![Build Status][travis-image]][travis-url]
@@ -49,6 +50,12 @@ Before you can start the bot you are going to have to set a couple of environmen
 To start it simply use the command `bdaybot`
 
 Once the bot is up and running and you've added it to one of your slack channels, it'll simply respond to any message directed towards it. It's not smart, any message to it should contain the **birthday** keyword.
+
+It also accepts the **help** command and returns a short description of how it works.
+
+![help](img/bday_help.png)
+
+Sample run:
 
 ![sample](img/bday_sample.png)
 
