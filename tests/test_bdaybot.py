@@ -2,16 +2,11 @@ import datetime
 
 import arrow
 import pytest
+from dateutil.parser import parse
 
-from bdaybot.bdaybot import (
-    adjust_date_with_timezone,
-    calculate_next_birth_date,
-    calculate_today,
-    days_left_to_birthday,
-    parse,
-    parse_message,
-)
+from bdaybot.bdaybot import BdayBot
 
+TEST_BOT = BdayBot()
 BD = parse("12/06/1972")
 ABD = arrow.get(BD)
 TZ = "America/Chicago"
@@ -19,19 +14,19 @@ ABDTZ = ABD.to(TZ)
 
 
 def test_adjust_date_with_timezone_ok():
-    adj_date = adjust_date_with_timezone(
+    adj_date = TEST_BOT.adjust_date_with_timezone(
         datetime.datetime(day=6, month=1, year=1987), "America/Argentina/Buenos_Aires"
     )
     assert (
         adj_date == datetime.datetime(1987, 1, 5, 12, 0, tzinfo=datetime.timezone.utc)
     )
-    adj_date = adjust_date_with_timezone(
+    adj_date = TEST_BOT.adjust_date_with_timezone(
         datetime.datetime(day=25, month=4, year=1994), "Africa/Nouakchott"
     )
     assert (
         adj_date == datetime.datetime(1994, 4, 25, 9, 0, tzinfo=datetime.timezone.utc)
     )
-    adj_date = adjust_date_with_timezone(
+    adj_date = TEST_BOT.adjust_date_with_timezone(
         datetime.datetime(day=11, month=7, year=1973), "America/Los_Angeles"
     )
     assert (
@@ -41,11 +36,11 @@ def test_adjust_date_with_timezone_ok():
 
 def test_adjust_date_with_timezone_fail():
     with pytest.raises(arrow.parser.ParserError):
-        adjust_date_with_timezone(datetime.datetime(day=6, month=1, year=1987), "Blah")
+        TEST_BOT.adjust_date_with_timezone(datetime.datetime(day=6, month=1, year=1987), "Blah")
     with pytest.raises(arrow.parser.ParserError):
-        adjust_date_with_timezone("6th january 1987", "America/Argentina/Buenos_Aires")
+        TEST_BOT.adjust_date_with_timezone("6th january 1987", "America/Argentina/Buenos_Aires")
     with pytest.raises(TypeError):
-        adjust_date_with_timezone(None, None)
+        TEST_BOT.adjust_date_with_timezone(None, None)
 
 
 def test_globals():
@@ -57,32 +52,32 @@ def test_globals():
 
 def test_calculate_today():
     arrow_today = arrow.now(TZ)
-    today = calculate_today(TZ)
+    today = TEST_BOT.calculate_today(TZ)
     assert today.year == arrow_today.year
     assert today.month == arrow_today.month
     assert today.day == arrow_today.day
 
 
 def test_calculate_next_birth_date():
-    date = calculate_next_birth_date(ABD, TZ)
+    date = TEST_BOT.calculate_next_birth_date(ABD, TZ)
     assert isinstance(date, arrow.Arrow)
     assert str(date.datetime) == "2018-12-05 18:00:00-06:00"
 
 
 def test_adjust_date_with_timezone():
-    adjusted_date = adjust_date_with_timezone(ABD, TZ)
+    adjusted_date = TEST_BOT.adjust_date_with_timezone(ABD, TZ)
     assert isinstance(adjusted_date, datetime.datetime)
     assert str(adjusted_date) == "1972-12-05 15:00:00+00:00"
 
 
 def test_days_left_to_birthday():
-    days = days_left_to_birthday(ABDTZ, TZ)
+    days = TEST_BOT.days_left_to_birthday(ABDTZ, TZ)
     assert isinstance(days, int)
 
 
 def test_parse_message():
     message = "<@U8DER4W6N> birthday 12/6/72"
-    result = parse_message(message, TZ)
+    result = TEST_BOT.parse_message(message, TZ)
     assert isinstance(result, arrow.Arrow)
     assert result.year == 1972
     assert result.month == 12
@@ -91,9 +86,9 @@ def test_parse_message():
 
 def test_parse_message_failed():
     message = "<@U8DER4W6N> good morning bot!"
-    result = parse_message(message, TZ)
+    result = TEST_BOT.parse_message(message, TZ)
     assert result is None
     # test for rare case where year is completely out of range
     message = "<@U8DER4W6N> my birthday is in 100 days haha don't expect that to work"
-    parsed_date = parse_message(message, TZ)
+    parsed_date = TEST_BOT.parse_message(message, TZ)
     assert parsed_date is None
