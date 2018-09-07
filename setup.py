@@ -25,8 +25,6 @@ setup(
         'python-dateutil',
         'slackclient',
         'SQLAlchemy',
-        'tox',
-        'tox-travis',
     ],
     entry_points='''
         [console_scripts]
