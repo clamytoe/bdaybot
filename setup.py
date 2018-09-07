@@ -30,7 +30,7 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        bdaybot=bdaybot.bdaybot:run_bot
+        bdaybot=bdaybot.bdaybot:run
     ''',
 )
 
